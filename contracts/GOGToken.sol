@@ -14,7 +14,7 @@ contract owned {
     }
 }
 
-contract GOG is owned {
+contract GOGToken is owned {
     // Public variables of the GOG token
     string public name;
     string public symbol;
@@ -47,7 +47,7 @@ contract GOG is owned {
         totalSupply = 10000000000000000;               // GOG's total supply is 10 billion with 6 decimals
         balances[msg.sender] = totalSupply;          // Give the creator all initial tokens
         name = "GoGlobe Token";                       // Token name is GoGlobe Token
-        symbol = "GOG";                               // token symbol is GOG
+        symbol = "GOGT";                               // token symbol is GOG
     }
 
     /**
