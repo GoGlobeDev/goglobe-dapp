@@ -1,11 +1,25 @@
-# Project Contracts
+# Project Contracts #
 
- Core Asset Contracts
+## Core Asset Contracts ##
 
-1. GOG ERC20 Token
+GOG核心资产合约，包括GOGToken ERC20， 资产登记 ERC721 和资产分割登记 三个合约。
 
-Name: GOG
+### GOG ERC20 Token ###
 
-Desc: ERC20 Token for GOG ecosystem
+**Name:** GOGToken
 
-Interface: ERC20, Ownerable
+**Desc:** ERC20 Token for goglobe ecosystem
+
+**Interface:** ERC20, Ownerable, safeMath
+
+[详细文档](contracts/GOGToken.md)
+
+### GOG ERC721 Token ###
+
+**Name:** GOGAsset
+
+**Desc:** ERC721 Token for rentable rooms in goglobe ecosystem.
+
+**Interface:** ERC721, Ownerable, safeMath
+
+[详细文档](contracts/GOGAsset.md)
