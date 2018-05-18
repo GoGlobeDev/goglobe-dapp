@@ -27,12 +27,6 @@ mapping (address => uint256) public frozenFunds;
 ### Functions ###
   1. 执行方法
     ````solidity
-    function freezeAccount
-    ````
-    ````solidity
-    function unFreezeAccount
-    ````
-    ````solidity
     function approve
     ````
     ````solidity
@@ -59,12 +53,6 @@ mapping (address => uint256) public frozenFunds;
     ````
 
 ### Events ###
-  ````solidity
-  event FrozenFunds
-  ````
-  ````solidity
-  event UnFrozenFunds
-  ````
   ````solidity
   event Transfer
   ````

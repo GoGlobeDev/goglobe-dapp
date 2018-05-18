@@ -10,7 +10,7 @@ GOG核心资产合约，包括GOGToken ERC20， 资产登记 ERC721 和资产分
 
 **Desc:** ERC20 Token for goglobe ecosystem
 
-**Interface:** ERC20, Ownerable, safeMath
+**Interface:** DetailedERC20, StandardToken, Ownable
 
 [详细文档](contracts/GOGToken.md)
 
