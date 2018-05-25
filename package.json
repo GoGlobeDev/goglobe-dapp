@@ -1,0 +1,11 @@
+{
+  "name": "goglobe-dapp",
+  "version": "0.0.3",
+  "description": "on chain house selling platform",
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "truffle-hdwallet-provider": "0.0.3",
+    "zeppelin-solidity": "1.8.0"
+  }
+}
