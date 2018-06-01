@@ -74,7 +74,7 @@ contract GOGBoard is Ownable {
      * @param targetMember ethereum address to be added
      * @param memberName public name for that member
      */
-    function addMember(address targetMember, string memberName) onlyOwner public {
+    function _addMember(address targetMember, string memberName) onlyOwner private {
         uint id = memberId[targetMember];
         if (id == 0) {
             memberId[targetMember] = members.length;
@@ -92,14 +92,19 @@ contract GOGBoard is Ownable {
      *
      * @param targetMember ethereum address to be removed
      */
-    function removeMember(address targetMember) onlyOwner public {
+    function _removeMember(address targetMember) onlyOwner private {
         require(memberId[targetMember] != 0);
 
         for (uint i = memberId[targetMember]; i<members.length-1; i++){
             members[i] = members[i+1];
         }
         delete members[members.length-1];
+        memberId[targetMember] = 0;
         members.length--;
+    }
+
+    function addMemberVoted (address targetMember, string memberName) {
+
     }
 
     /**
