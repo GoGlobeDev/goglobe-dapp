@@ -13,31 +13,26 @@ contract GOGBoardAccessor {
   GOGBoard gogBoard;
 
   // @dev check if GOG SYSTEM is not paused.
-  modifier whenVideoBaseNotPaused() {
-    require(address(gogBoard) != address(0) &&
-            !gogBoard.paused());
-    _;
+  modifier whenNotPaused {
   }
 
-  // @dev check if the sender is one of the board members of GoGlobe.
-  modifier onlyGOGBoardMembers() {
-    require(address(gogBoard) != address(0) &&
-            gogBoard.findBoardMember(msg.sender) >= 0);
-    _;
+  modifier onlyBoardMember {
   }
 
-  // @dev check if the sender is one of the system accounts of GOGBoard.
-  modifier onlyGOGSystemAccounts() {
-    require(address(gogBoard) != address(0) &&
-            gogBoard.findSystemAccount(msg.sender) >= 0);
-    _;
+  modifier onlyChairMan {
+
   }
 
-  // @dev check if the sender is from GOGBoard contract.
-  modifier onlyFromGOGBoard() {
-    require(address(gogBoard) != address(0) &&
-            msg.sender == address(gogBoard));
-    _;
+  modifier onlySecretaryGeneral {
+
+  }
+
+  modifier onlyAdmin {
+
+  }
+
+  modifier whenIsSystemAddress {
+
   }
 
   // @dev set GOGBoard contract. Only when gogBoard is empty
