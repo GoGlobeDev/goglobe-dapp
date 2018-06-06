@@ -164,14 +164,20 @@ contract GOGBoard is Ownable {
       emit SetMinutesForDebate(msg.sender, _minutesForDebate);
     }
 
-    function addSystemAddress(address systemAddress) public onlyAdmin  {
-      systemAddress[systemAddress] = true;
-      emit AddSystemAddress(msg.sender, systemAddress);
+    function addSystemAddress(address _systemAddress) public onlyAdmin  {
+      require(address(0) != _systemAddress);
+      systemAddress[_systemAddress] = true;
+      emit AddSystemAddress(msg.sender, _systemAddress);
     }
 
-    function removeSystemAddress(address systemAddress) public onlyAdmin  {
-      delete systemAddress[systemAddress];
-      emit DeleteSystemAddress(msg.sender, systemAddress);
+    function removeSystemAddress(address _systemAddress) public onlyAdmin  {
+      require(address(0) != _systemAddress);
+      delete systemAddress[_systemAddress];
+      emit DeleteSystemAddress(msg.sender, _systemAddress);
+    }
+
+    function isSystemAddress(address _systemAddress) public view returns (bool) {
+      return systemAddress[_systemAddress];
     }
 
     function vote(uint8 type, bool isAgree) public onlyMember whenCorrectType(type) {
