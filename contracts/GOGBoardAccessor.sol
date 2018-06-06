@@ -47,7 +47,7 @@ contract GOGBoardAccessor {
   // @param _gogBoard to be set.
   function setGOGBoard(address _gogBoard)
       public {
-    require(address(_gogBoard) == address(0));
+    require(address(_gogBoard) != address(0));
     GOGBoard myGOGBoard = GOGBoard(_gogBoard);
     require(myGOGBoard.supportsGOGBoard() == "THIS IS GOGBoard");
     gogBoard = myGOGBoard;
