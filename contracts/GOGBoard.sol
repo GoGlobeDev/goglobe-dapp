@@ -11,7 +11,7 @@ contract GOGBoard is Ownable {
     */
     struct BoardMember{
       address memberAddress;
-      uint64 memberTime;
+      uint memberTime;
       String memberName;
     }
 
@@ -31,6 +31,7 @@ contract GOGBoard is Ownable {
     BoardMember[] boardMembers;
     mapping (uint8 -> Propose) voteToPropose;
     mapping (address -> uint) memberToIndex;
+    uint minutesForDebate;
     uint sGMarginOfVotesForMajority;
     uint minimumQuorumForProposals;
     uint addMarginOfVotesForMajority;
@@ -39,54 +40,99 @@ contract GOGBoard is Ownable {
     address chairMan;
     address secretaryGeneral;
     mapping (address -> bool) systemAddress;
-    bool isPause;
+    bool pause;
 
-    modifier onlyMembers {
-        require(memberId[msg.sender] != 0);
-        _;
-    }
-
+    /**
+    *  only admin could operate
+    */
     modifier onlyAdmin {
-
+      require(msg.sender == chairMan || msg.sender == secretaryGeneral);
+      _;
     }
 
+    /**
+    *  only boardMember could operate
+    */
     modifier onlyBoardMember {
-
+      require(memberId[msg.sender] != 0);
+      _;
     }
+
+    /**
+    *  only the contract not pause
+    */
+    modifier whenIsNotPaused {
+      require(!pause);
+      _;
+    }
+
+    event SetSGMarginOfVotesForMajority(address indexed _person, uint _sGMarginOfVotesForMajority);
+    event SetMinimumQuorumForProposals(address indexed _person, uint _minimumQuorumForProposals);
+    event SetAddMarginOfVotesForMajority(address indexed _person, uint _addMarginOfVotesForMajority);
+    event SetDeleteMarginOfVotesForMajority(address indexed _person, uint _deleteMarginOfVotesForMajority);
+    event SetCMMarginOfVotesForMajority(address indexed _person, uint _cMMarginOfVotesForMajority);
+    event SetMinutesForDebate(address indexed _person, uint _minutesForDebate);
 
     /**
      * Constructor function
      */
     function GOGBoard (
-      uint sGMarginOfVotesForMajority,
-      uint minimumQuorumForProposals,
-      uint addMarginOfVotesForMajority,
-      uint deleteMarginOfVotesForMajority,
-      uint cMMarginOfVotesForMajority,
+      uint _sGMarginOfVotesForMajority,
+      uint _minimumQuorumForProposals,
+      uint _addMarginOfVotesForMajority,
+      uint _deleteMarginOfVotesForMajority,
+      uint _cMMarginOfVotesForMajority,
+      uint _minutesForDebate,
+      string _memberName
     )
       public
     {
-
+      sGMarginOfVotesForMajority = _sGMarginOfVotesForMajority;
+      minimumQuorumForProposals = _minimumQuorumForProposals;
+      addMarginOfVotesForMajority = _addMarginOfVotesForMajority;
+      deleteMarginOfVotesForMajority = _deleteMarginOfVotesForMajority;
+      cMMarginOfVotesForMajority = _cMMarginOfVotesForMajority;
+      minutesForDebate = _minutesForDebate;
+      chairMan = msg.sender;
+      secretaryGeneral = msg.sender;
+      BoardMember boardMember = BoardMember ({
+        memberAddress:msg.sender,
+        memberTime:now,
+        memberName:_memberName
+      });
+      uint length = boardMembers.push(boardMember);
+      memberToIndex[msg.sender] = length - 1;
+      pause = false;
     }
 
-    function setSGMarginOfVotesForMajority (uint sGMarginOfVotesForMajority) public onlyAdmin {
-
+    function setSGMarginOfVotesForMajority (uint _sGMarginOfVotesForMajority) public onlyAdmin {
+      sGMarginOfVotesForMajority = _sGMarginOfVotesForMajority;
+      emit SetSGMarginOfVotesForMajority(msg.sender, _sGMarginOfVotesForMajority);
     }
 
-    function setMinimumQuorumForProposals(uint minimumQuorumForProposals) public onlyAdmin {
-
+    function setMinimumQuorumForProposals(uint _minimumQuorumForProposals) public onlyAdmin {
+      minimumQuorumForProposals = _minimumQuorumForProposals;
+      emit SetMinimumQuorumForProposals(msg.sender, _minimumQuorumForProposals);
     }
 
-    function setAddMarginOfVotesForMajority (uint addMarginOfVotesForMajority) public onlyAdmin  {
-
+    function setAddMarginOfVotesForMajority (uint _addMarginOfVotesForMajority) public onlyAdmin  {
+      addMarginOfVotesForMajority = _addMarginOfVotesForMajority;
+      emit SetAddMarginOfVotesForMajority(msg.sender, _addMarginOfVotesForMajority);
     }
 
-    function setDeleteMarginOfVotesForMajority(uint deleteMarginOfVotesForMajority) public onlyAdmin {
-
+    function setDeleteMarginOfVotesForMajority(uint _deleteMarginOfVotesForMajority) public onlyAdmin {
+      deleteMarginOfVotesForMajority = _deleteMarginOfVotesForMajority;
+      emit SetDeleteMarginOfVotesForMajority(msg.sender, _deleteMarginOfVotesForMajority);
     }
 
-    function setCMMarginOfVotesForMajority(uint cMMarginOfVotesForMajority) public onlyAdmin {
+    function setCMMarginOfVotesForMajority(uint _cMMarginOfVotesForMajority) public onlyAdmin {
+      cMMarginOfVotesForMajority = _cMMarginOfVotesForMajority;
+      emit SetCMMarginOfVotesForMajority(msg.sender, _cMMarginOfVotesForMajority);
+    }
 
+    function setMinutesForDebate(uint _minutesForDebate) public onlyAdmin {
+      minutesForDebate = _minutesForDebate;
+      emit SetMinutesForDebate(msg.sender, _minutesForDebate);
     }
 
     function addSystemAddress(address systemAddress) public onlyAdmin  {
