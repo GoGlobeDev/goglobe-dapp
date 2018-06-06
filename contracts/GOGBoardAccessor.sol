@@ -38,7 +38,7 @@ contract GOGBoardAccessor {
     _;
   }
 
-  modifier whenIsSystemAddress(address _systemAddress) {
+  modifier onlySystemAddress(address _systemAddress) {
     require(isSystemAddress(_systemAddress));
     _;
   }
@@ -49,7 +49,7 @@ contract GOGBoardAccessor {
       public {
     require(address(_gogBoard) != address(0));
     GOGBoard myGOGBoard = GOGBoard(_gogBoard);
-    require(myGOGBoard.supportsGOGBoard() == "THIS IS GOGBoard");
+    require(myGOGBoard.supportsGOGBoard() == "GOGBOARD");
     gogBoard = myGOGBoard;
   }
 

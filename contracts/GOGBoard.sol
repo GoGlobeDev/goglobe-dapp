@@ -35,7 +35,7 @@ contract GOGBoard is Ownable {
     uint8 constant TYPE_UPDATE_SECRETARYGENERAL = 4;
     uint8 constant EXECUTE_RESULT_FAIL = 0;
     uint8 constant EXECUTE_RESULT_SUCCESS = 1;
-    bytes32 constant SUPPORT = "THIS IS GOGBoard";
+    bytes32 constant SUPPORT = "GOGBOARD";
     bool pause;
     uint minutesForDebate;
     uint minimumQuorumForProposals;
@@ -62,7 +62,7 @@ contract GOGBoard is Ownable {
     *  only boardMember could operate
     */
     modifier onlyBoardMember {
-      require(memberId[msg.sender] != 0);
+      require(memberId[msg.sender] != 0x0);
       _;
     }
 
@@ -200,13 +200,13 @@ contract GOGBoard is Ownable {
       Propose oldPropose = voteToPropose[type];
       require(!oldPropose.isVoting);
       Propose propose = Propose({
-        numberOfVotes:0,
-        agree:0,
-        startTime:now,
-        endTime:now + debatingPeriodInMinutes * 1 minutes,
-        isVoting:true,
-        votedAddress:memberVoted,
-        votedName:_votedName
+        numberOfVotes: 0,
+        agree: 0,
+        startTime: now,
+        endTime: now + debatingPeriodInMinutes * 1 minutes,
+        isVoting: true,
+        votedAddress: memberVoted,
+        votedName: _votedName
       });
       voteToPropose[type] = propose;
       emit ProposeEvent(msg.sender, type, memberVoted);
