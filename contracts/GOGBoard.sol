@@ -35,6 +35,7 @@ contract GOGBoard is Ownable {
     uint8 constant TYPE_UPDATE_SECRETARYGENERAL = 4;
     uint8 constant EXECUTE_RESULT_FAIL = 0;
     uint8 constant EXECUTE_RESULT_SUCCESS = 1;
+    bytes32 constant SUPPORT = "THIS IS GOGBoard";
     bool pause;
     uint minutesForDebate;
     uint minimumQuorumForProposals;
@@ -132,6 +133,10 @@ contract GOGBoard is Ownable {
       uint length = boardMembers.push(boardMember);
       memberToIndex[msg.sender] = length - 1;
       pause = false;
+    }
+
+    function supportsGOGBoard() public view returns(bytes) {
+      return SUPPORT;
     }
 
     function setSGMarginOfVotesForMajority (uint _sGMarginOfVotesForMajority) public onlyAdmin {

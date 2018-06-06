@@ -49,7 +49,7 @@ contract GOGBoardAccessor {
       public {
     require(address(_gogBoard) == address(0));
     GOGBoard myGOGBoard = GOGBoard(_gogBoard);
-    require(myGOGBoard.supportsGOGBoard());
+    require(myGOGBoard.supportsGOGBoard() == "THIS IS GOGBoard");
     gogBoard = myGOGBoard;
   }
 
