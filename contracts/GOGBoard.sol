@@ -216,29 +216,31 @@ contract GOGBoard is Ownable {
       Propose propose = voteToPropose[type];
       require(propose.isVoting == true && now >= endTime);
       uint8 executeResult = EXECUTE_RESULT_SUCCESS;
-      if (minimumQuorumForProposals > voteToPropose.numberOfVotes) {
+      uint disAgreeNumber = propose.numberOfVotes - propose.agree;
+      if (minimumQuorumForProposals > voteToPropose.numberOfVotes || propose.agree < disAgreeNumber) {
         executeResult = EXECUTE_RESULT_FAIL;
       } else {
+        uint margin = propose.agree - disAgreeNumber;
         if(TYPE_ADD == type) {
-          if (propose.agree >= addMarginOfVotesForMajority) {
+          if (margin >= addMarginOfVotesForMajority) {
             _addMember(propose.votedAddress, propose.votedName);
           } else {
             executeResult = EXECUTE_RESULT_FAIL;
           }
         } else if(TYPE_DELETE == type) {
-          if(propose.agree >= deleteMarginOfVotesForMajority) {
+          if(margin >= deleteMarginOfVotesForMajority) {
             _removeMember(propose.votedAddress);
           } else {
             executeResult = EXECUTE_RESULT_FAIL;
           }
         } else if(TYPE_UPDATE_CHAIRMAN == type) {
-          if (propose.agree >= cMMarginOfVotesForMajority) {
+          if (margin >= cMMarginOfVotesForMajority) {
             _updateChairMan(propose.votedAddress);
           } else {
             executeResult = EXECUTE_RESULT_FAIL;
           }
         } else if (TYPE_UPDATE_SECRETARYGENERAL == type) {
-          if (propose.agree >= sGMarginOfVotesForMajority) {
+          if (margin >= sGMarginOfVotesForMajority) {
             _updateSecretaryGeneral(propose.votedAddress);
           } else {
             executeResult = EXECUTE_RESULT_FAIL;
