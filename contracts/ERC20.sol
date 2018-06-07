@@ -8,22 +8,15 @@ contract ERC20 {
 
     string name;
     string symbol;
-    uint8 property;
     uint256 totalSupply;
+    bool couldMint = false;
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) internal allowed;
 
     event Mint(address indexed to, uint256 amount);
     event Burn(address indexed burner, uint256 value);
     event Transfer(address indexed from, address indexed to, uint256 value);
-    event MintFinished();
     event Approval(address indexed owner, address indexed spender, uint256 value);
-
-    modifier canMint {
-
-    }
-    modifier hasMintPermission {
-    }
 
     function ERC20(string _name, string _symbol, uint8 _decimals, uint256 _totalSupply) public {
       name = _name;
@@ -45,48 +38,68 @@ contract ERC20 {
       return allowed[owner][spender];
     }
 
-    function approve(address spender, uint256 value) internal (bool) {
+    function _approve(address spender, uint256 value) internal (bool) {
       require(balances[msg.sender] >= value);
       allowed[msg.sender][spender] = value;
       Approval(msg.sender, spender, value);
       return true;
     }
 
-    function decreaseApproval(address _spender, uint _subtractedValue) internal (bool) {
-      if(allowed[msg.sender][spender] <= _subtractedValue) {
+    function _decreaseApproval(address spender, uint subtractedValue) internal (bool) {
+      if(allowed[msg.sender][spender] <= subtractedValue) {
         delete allowed[msg.sender];
       } else {
-        allowed[msg.sender][spender] = allowed[msg.sender][spender].sub(_subtractedValue);
+        allowed[msg.sender][spender] = allowed[msg.sender][spender].sub(subtractedValue);
       }
       Approval(msg.sender, spender, allowed[msg.sender][spender]);
     }
 
-    function increaseApproval(address _spender, uint _addedValue) internal (bool) {
-      require(balances[msg.sender].sub(allowed[msg.sender][spender]) >= _addedValue);
-      allowed[msg.sender][spender] = allowed[msg.sender][spender].add(_addedValue);
+    function _increaseApproval(address spender, uint addedValue) internal (bool) {
+      require(balances[msg.sender].sub(allowed[msg.sender][spender]) >= addedValue);
+      allowed[msg.sender][spender] = allowed[msg.sender][spender].add(addedValue);
       Approval(msg.sender, spender, allowed[msg.sender][spender]);
       return true;
     }
 
-    function transfer (address _to, uint256 _value) internal (bool) {
-      require(address(0) != _to);
-
+    function _transfer(address to, uint256 value) internal (bool) {
+      require(address(0) != to);
+      require(value <= balances[msg.sender]);
+      balances[msg.sender] = balances[msg.sender].sub(value);
+      balances[to] = balances[to].add(value);
+      emit Transfer(msg.sender, to, value);
+      return true;
     }
 
-    function transferFrom (address _from, address _to, uint256 _value) internal (bool) {
-
+    function _transferFrom(address from, address to, uint256 value) internal (bool) {
+      require(address(0) != to);
+      require(value <= balances[from]);
+      require(value <= allowed[from][msg.sender]);
+      balances[from] = balances[from].sub(value);
+      balances[to] = balances[to].add(value);
+      allowed[from][msg.sender] = allowed[from][msg.sender].sub(value);
+      emit Transfer(from, to, value);
+      return true;
     }
 
-    function mint(address _to, uint256 _amount) internal{
-
+    function _mint(address to, uint256 amount) internal{
+      require(couldMint);
+      totalSupply = totalSupply.add(amount);
+      balances[to] = balances[to].add(amount);
+      emit Mint(to, amount);
+      emit Transfer(address(0), to, amount);
+      return true;
     }
 
-    function finishMinting() internal (bool) {
-
+    function _changeCouldMint(bool _couldMint) internal {
+      couldMint = _couldMint;
     }
 
-    function burn(address _who, uint256 _value) internal {
-
+    function _burn(address who, uint256 value) internal {
+      require(value <= balances[who]);
+      balances[who] = balances[who].sub(value);
+      totalSupply = totalSupply.sub(value);
+      emit Burn(who, value);
+      emit Transfer(who, address(0), value);
     }
 
 }

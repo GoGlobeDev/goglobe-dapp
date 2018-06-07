@@ -10,8 +10,8 @@ contract Operator is GOGBoardAccessor {
       bool isActive;
     }
 
-    mapping (address -> uint) Operators;
-    mapping (uint -> OperatorInfo) OperatorInfos;
+    mapping (address => uint) Operators;
+    mapping (uint => OperatorInfo) OperatorInfos;
     uint length;
 
     function addOperator(address operatorAddress) public {

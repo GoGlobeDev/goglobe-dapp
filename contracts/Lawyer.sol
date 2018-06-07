@@ -10,8 +10,8 @@ contract Lawyer is GOGBoardAccessor {
       bool isActive;
     }
 
-    mapping (address -> uint) lawyers;
-    mapping (uint -> LawyerInfo) lawyerInfos;
+    mapping (address => uint) lawyers;
+    mapping (uint => LawyerInfo) lawyerInfos;
     uint length;
 
     function addLawyer(address lawyerAddress) public {

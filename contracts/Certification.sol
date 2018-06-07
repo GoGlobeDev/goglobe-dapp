@@ -6,10 +6,10 @@ contract Certification is GOGBoardAccessor {
 
     using SafeMath for uint256;
 
-    mapping(uint -> uint[]) lawyerToGOGA;
-    mapping(uint -> uint) GOGAToLawyer;
-    mapping(uint -> uint) GOGAToOperator;
-    mapping(uint -> uint[]) operatorToGOGA;
+    mapping(uint => uint[]) lawyerToGOGA;
+    mapping(uint => uint) GOGAToLawyer;
+    mapping(uint => uint) GOGAToOperator;
+    mapping(uint => uint[]) operatorToGOGA;
 
     modifier onlyLawyer {
 

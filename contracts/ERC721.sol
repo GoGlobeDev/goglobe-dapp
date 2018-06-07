@@ -10,12 +10,12 @@ contract ERC721 {
   string name;
   string symbol;
   uint256[] internal allTokens;
-  mapping (uint256 -> uint256) internal ownedTokensIndex;
-  mapping (uint256 -> uint256) internal allTokensIndex;
-  mapping (address -> uint256) internal ownedTokensCount;
-  mapping (uint256 -> address) internal tokenOwner;
-  mapping (address -> uint256[]) internal ownedTokens;
-  mapping (address -> mapping (address -> bool)) internal operatorApprovals;
+  mapping (uint256 => uint256) internal ownedTokensIndex;
+  mapping (uint256 => uint256) internal allTokensIndex;
+  mapping (address => uint256) internal ownedTokensCount;
+  mapping (uint256 => address) internal tokenOwner;
+  mapping (address => uint256[]) internal ownedTokens;
+  mapping (address => mapping (address => bool)) internal operatorApprovals;
 
   event ApprovalForAll(address indexed _owner, address indexd _operator, bool _approved);
   event Transfer(address indexed _from, address indexed _to, uint256 _tokenId);

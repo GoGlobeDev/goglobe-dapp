@@ -20,7 +20,7 @@ contract GOGBoard is Ownable {
     */
     struct Propose {
       uint numberOfVotes;
-      mapping (address -> bool) voted;
+      mapping (address => bool) voted;
       uint agree;
       uint startTime;
       uint endTime;
