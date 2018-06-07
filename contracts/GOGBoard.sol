@@ -45,9 +45,9 @@ contract GOGBoard is Ownable {
     uint cMMarginOfVotesForMajority;
     address chairMan;
     address secretaryGeneral;
-    mapping (uint8 -> Propose) voteToPropose;
-    mapping (address -> uint) memberToIndex;
-    mapping (address -> bool) systemAddress;
+    mapping (uint8 => Propose) voteToPropose;
+    mapping (address => uint) memberToIndex;
+    mapping (address => bool) systemAddress;
     BoardMember[] boardMembers;
 
     /**
@@ -216,7 +216,7 @@ contract GOGBoard is Ownable {
       Propose propose = voteToPropose[type];
       require(propose.isVoting == true && now >= endTime);
       uint8 executeResult = EXECUTE_RESULT_SUCCESS;
-      uint disAgreeNumber = propose.numberOfVotes - propose.agree;
+      uint disAgreeNumber = propose.numberOfVotes.sub(propose.agree);
       if (minimumQuorumForProposals > voteToPropose.numberOfVotes || propose.agree < disAgreeNumber) {
         executeResult = EXECUTE_RESULT_FAIL;
       } else {
