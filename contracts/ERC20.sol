@@ -38,14 +38,14 @@ contract ERC20 {
       return allowed[owner][spender];
     }
 
-    function _approve(address spender, uint256 value) internal (bool) {
+    function _approve(address spender, uint256 value) internal returns (bool) {
       require(balances[msg.sender] >= value);
       allowed[msg.sender][spender] = value;
       Approval(msg.sender, spender, value);
       return true;
     }
 
-    function _decreaseApproval(address spender, uint subtractedValue) internal (bool) {
+    function _decreaseApproval(address spender, uint subtractedValue) internal returns (bool) {
       if(allowed[msg.sender][spender] <= subtractedValue) {
         delete allowed[msg.sender];
       } else {
@@ -54,39 +54,39 @@ contract ERC20 {
       Approval(msg.sender, spender, allowed[msg.sender][spender]);
     }
 
-    function _increaseApproval(address spender, uint addedValue) internal (bool) {
+    function _increaseApproval(address spender, uint addedValue) internal returns (bool) {
       require(balances[msg.sender].sub(allowed[msg.sender][spender]) >= addedValue);
       allowed[msg.sender][spender] = allowed[msg.sender][spender].add(addedValue);
       Approval(msg.sender, spender, allowed[msg.sender][spender]);
       return true;
     }
 
-    function _transfer(address to, uint256 value) internal (bool) {
+    function _transfer(address to, uint256 value) internal returns (bool) {
       require(address(0) != to);
       require(value <= balances[msg.sender]);
       balances[msg.sender] = balances[msg.sender].sub(value);
       balances[to] = balances[to].add(value);
-      emit Transfer(msg.sender, to, value);
+      Transfer(msg.sender, to, value);
       return true;
     }
 
-    function _transferFrom(address from, address to, uint256 value) internal (bool) {
+    function _transferFrom(address from, address to, uint256 value) internal returns (bool) {
       require(address(0) != to);
       require(value <= balances[from]);
       require(value <= allowed[from][msg.sender]);
       balances[from] = balances[from].sub(value);
       balances[to] = balances[to].add(value);
       allowed[from][msg.sender] = allowed[from][msg.sender].sub(value);
-      emit Transfer(from, to, value);
+      Transfer(from, to, value);
       return true;
     }
 
-    function _mint(address to, uint256 amount) internal{
+    function _mint(address to, uint256 amount) internal {
       require(couldMint);
       totalSupply = totalSupply.add(amount);
       balances[to] = balances[to].add(amount);
-      emit Mint(to, amount);
-      emit Transfer(address(0), to, amount);
+      Mint(to, amount);
+      Transfer(address(0), to, amount);
       return true;
     }
 
@@ -98,8 +98,8 @@ contract ERC20 {
       require(value <= balances[who]);
       balances[who] = balances[who].sub(value);
       totalSupply = totalSupply.sub(value);
-      emit Burn(who, value);
-      emit Transfer(who, address(0), value);
+      Burn(who, value);
+      Transfer(who, address(0), value);
     }
 
 }
