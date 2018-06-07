@@ -7,42 +7,42 @@ contract Exchange is GOGBoardAccessor {
 
     using SafeMath for uint256;
 
-    bool pause;
+    bool exchangeFunctionPause = false;
     uint rate;
     uint fee;
     address beneficiary;
     GOGT gogT;
 
     modifier whenFuntionNotPaused {
-      require(!pause);
+      require(!exchangeFunctionPause);
       _;
     }
 
-    function changeRate(uint _rate) {
-
+    function changeRate(uint _rate) public whenNotPaused onlyAdmin {
+      rate = _rate;
     }
 
-    function changeFee(uint _fee) {
-
-    }
-
-    function buyGOGT(uint value) {
-
-    }
-
-    function sellGOGT(uint value) {
-
+    function changeFee(uint _fee) public whenNotPaused onlyAdmin {
+      fee = _fee;
     }
 
     function changeBeneficiary(address _beneficiary) public whenNotPaused onlyAdmin{
       beneficiary = _beneficiary;
     }
 
-    function functionPause() {
+    function buyGOGT(uint gogValue) public payable whenNotPaused {
 
     }
 
-    function unFunctionPause() {
+    function sellGOGT(uint gogValue) public payable whenNotPaused whenFuntionNotPaused {
 
+    }
+
+    function functionPause() public whenNotPaused onlyAdmin{
+      exchangeFunctionPause = true;
+    }
+
+    function unFunctionPause() public whenNotPaused onlyAdmin{
+      exchangeFunctionPause = false;
     }
 }

@@ -73,6 +73,7 @@ contract ERC20 {
     }
 
     function _transferFrom(address from, address to, uint256 value) internal returns (bool) {
+      require(address(0) != from);
       require(address(0) != to);
       require(value <= balances[from]);
       require(value <= allowed[from][msg.sender]);

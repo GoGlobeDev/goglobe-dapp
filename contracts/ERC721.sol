@@ -14,6 +14,7 @@ contract ERC721 {
   mapping (uint256 => uint256) internal allTokensIndex;
   mapping (address => uint256) internal ownedTokensCount;
   mapping (uint256 => address) internal tokenOwner;
+  mapping (uint256 => address) internal tokenApprovals;
   mapping (address => uint256[]) internal ownedTokens;
   mapping (address => mapping (address => bool)) internal operatorApprovals;
 
@@ -29,51 +30,104 @@ contract ERC721 {
     _;
   }
 
-  function isApprovedOrOwner() public view returns (bool){
-
+  constructor(string _name, string _symbol) public {
+    name = _name;
+    symbol = _symbol;
   }
 
   function totalSupply() public view returns (uint256) {
-
+    return allTokens.length;
   }
 
   function tokensOf(address _owner) public view returns (uint256[]) {
-
+    return ownedTokens[_owner];
   }
 
   function getApproved(uint256 _tokenId) public view returns (address) {
-
-  }
-
-  function tokenOfOwnerByIndex(address _owner, uint256 _index) public view returns (uint256 _tokenId) {
-
+    return tokenApprovals[_tokenId];
   }
 
   function isApprovedForAll(address _owner, address _operator) public view returns (bool) {
+    return operatorApprovals[_owner][_operator];
+  }
 
+  function tokenOfOwnerByIndex(address _owner, uint256 _index) public view returns (uint256) {
+    require(_index < balanceOf(_owner));
+    return ownedTokens[_owner][_index];
   }
 
   function tokenByIndex(uint256 _index) public view returns (uint256) {
-
+    require(_index < totalSupply());
+    return allTokens[_index];
   }
 
-  function balanceOf (address _owner) public view returns (uint256) {
-
+  function balanceOf(address _owner) public view returns (uint256) {
+    require(address(0) != _owner);
+    return ownedTokensCount[_owner];
   }
 
   function ownerOf(uint256 _tokenId) public view returns (address) {
-
+    address owner = tokenOwner[_tokenId];
+    require(address(0) != owner);
+    return owner;
   }
 
   function exists(uint256 _tokenId) public view returns (bool) {
-
+    address owner = tokenOwner[_tokenId];
+    return owner != address(0);
   }
 
-  function safeTransferFrom (address _from, address _to, uint256 _tokenId, bytes _data) internal {
-
+  function approve(address _to, uint256 _tokenId) internal {
+    address owner = ownerOf(_tokenId);
+    require(_to != owner);
+    require(msg.sender == owner || isApprovedForAll(owner,msg.sender));
+    if (getApproved(_tokenId) != address(0) || _to != address(0)) {
+      tokenApprovals[_tokenId] = _to;
+      emit Approval(owner, _to, _tokenId);
+    }
   }
 
-  function setApprovalForAll(address _to, bool _approved) internal {
+  function _setApprovalForAll(address _to, bool _approved) internal {
+    require(_to != msg.sender);
+    operatorApprovals[msg.sender][_to] = _approved;
+    emit ApprovalForAll(msg.sender, _to, _approved);
+  }
+
+  function _isApprovedOrOwner(address spender, uint256 tokenId) internal view returns (bool){
+    address owner = ownerOf(tokenId);
+    return (spender == owner || getApproved(tokenId) == spender || isApprovedForAll(owner,spender));
+  }
+
+  function _clearApproval (address _owner, uint256 _tokenId) internal {
+    require(_owner == ownerOf(_tokenId));
+    if (tokenApprovals[_tokenId] != address(0)) {
+      tokenApprovals[_tokenId] = address(0);
+      emit Approval(_owner, address(0), _tokenId);
+    }
+  }
+
+  function _removeTokenFrom(address _from, uint256 _tokenId) internal{
+    require(ownerOf(_tokenId) == _from);
+    ownedTokensCount[_from] = ownedTokensCount[_from].sub(1);
+    tokenOwner[_tokenId] = address(0);
+  }
+
+  function _addTokenTo(address _to, uint256 _tokenId) internal {
+    require(tokenOwner[_tokenId] == address(0));
+    tokenOwner[_tokenId] = _to;
+    ownedTokensCount[_to] = ownedTokensCount[_to].add(1);
+  }
+
+  function _transferFrom(address _from, address _to, uint256 _tokenId) internal{
+    require(address(0) != _from);
+    require(address(0) != _to);
+    _clearApproval(_from,_tokenId);
+    _removeTokenFrom(_from, _tokenId);
+    _addTokenTo(_to, _tokenId);
+    emit Transfer(_from, _to, _tokenId);
+  }
+
+  function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes _data) internal {
 
   }
 
@@ -84,27 +138,7 @@ contract ERC721 {
 
   }
 
-  function transferFrom (address _from, address _to, uint256 _tokenId) internal{
-
-  }
-
   function safeTransferFrom (address _from, address _to, uint256 _tokenId) internal{
-
-  }
-
-  function approve(address _to, uint256 _tokenId) internal{
-
-  }
-
-  function clearApproval (address _owner, uint256 _tokenId) internal {
-
-  }
-
-  function addTokenTo(address _to, uint256 _tokenId) internal {
-
-  }
-
-  function removeTokenFrom(address _from, uint256 _tokenId) internal{
 
   }
 
