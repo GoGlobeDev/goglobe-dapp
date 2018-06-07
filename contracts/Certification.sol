@@ -16,7 +16,7 @@ contract Certification is GOGBoardAccessor {
     }
 
     modifier onlyOperator {
-      
+
     }
 
     function certificateByLawyer(address lawyerAddress, uint256 tokenId) public returns (bool){
