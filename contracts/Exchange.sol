@@ -12,8 +12,9 @@ contract Exchange is GOGBoardAccessor {
     address beneficiary;
     GOGT gogT;
 
-    modifier whenNotPaused {
-
+    modifier whenFuntionNotPaused {
+      require(!pause);
+      _;
     }
 
     function changeRate(uint rate) {
@@ -32,12 +33,8 @@ contract Exchange is GOGBoardAccessor {
 
     }
 
-    function withdraw() {
-
-    }
-
-    function changeBeneficiary(address beneficiary) {
-
+    function changeBeneficiary(address _beneficiary) public whenNotPaused onlyAdmin{
+      beneficiary = _beneficiary;
     }
 
     function functionPause() {

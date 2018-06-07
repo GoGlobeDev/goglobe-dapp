@@ -9,23 +9,23 @@ contract GOGT is GOGBoardAccessor,ERC20 {
     function GOGT(string _name, string _symbol, uint8 _decimals, uint256 _totalSupply) ERC20(_name, _symbol, _decimals, _totalSupply) public {
     }
 
-    function approve(address spender, uint256 value) public whenNotPaused (bool) {
+    function approve(address spender, uint256 value) public whenNotPaused returns (bool) {
       return _approve(spender,value);
     }
 
-    function increaseApproval(address spender, uint addedValue) public whenNotPaused (bool){
+    function increaseApproval(address spender, uint addedValue) public whenNotPaused returns (bool){
       return _increaseApproval(spender, addedValue);
     }
 
-    function decreaseApproval(address spender, uint subtractedValue) public whenNotPaused (bool) {
+    function decreaseApproval(address spender, uint subtractedValue) public whenNotPaused returns (bool) {
       return _decreaseApproval(spender, addedValue);
     }
 
-    function transfer(address to, uint256 value) public whenNotPaused (bool){
+    function transfer(address to, uint256 value) public whenNotPaused returns (bool){
       return _transfer(to, value);
     }
 
-    function transferFrom(address from, address to, uint256 value) public whenNotPaused (bool){
+    function transferFrom(address from, address to, uint256 value) public whenNotPaused returns (bool){
       return _transferFrom(from, to, value);
     }
 
@@ -33,11 +33,11 @@ contract GOGT is GOGBoardAccessor,ERC20 {
       _changeCouldMint(couldMint);
     }
 
-    function mint(address to, uint256 amount) public whenNotPaused onlyAdmin {
-      _mint(to, amount);
+    function mint(address to, uint256 amount) public whenNotPaused onlyAdmin returns (bool) {
+      return _mint(to, amount);
     }
 
-    function burn(address who, uint256 value) public whenNotPaused onlyAdmin {
-      _burn(who, value);
+    function burn(address who, uint256 value) public whenNotPaused onlyAdmin returns (bool) {
+      return _burn(who, value);
     }
 }
