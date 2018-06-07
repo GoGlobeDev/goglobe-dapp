@@ -1,6 +1,7 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.23;
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
+import "./GOGT.sol";
 
 contract Exchange is GOGBoardAccessor {
 
@@ -17,11 +18,11 @@ contract Exchange is GOGBoardAccessor {
       _;
     }
 
-    function changeRate(uint rate) {
+    function changeRate(uint _rate) {
 
     }
 
-    function changeFee(uint fee) {
+    function changeFee(uint _fee) {
 
     }
 

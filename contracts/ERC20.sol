@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.23;
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 
@@ -8,7 +8,8 @@ contract ERC20 {
 
     string name;
     string symbol;
-    uint256 totalSupply;
+    uint8 decimals;
+    uint256 totalSupply_;
     bool couldMint = false;
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) internal allowed;
@@ -18,16 +19,16 @@ contract ERC20 {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
-    function ERC20(string _name, string _symbol, uint8 _decimals, uint256 _totalSupply) public {
+    constructor(string _name, string _symbol, uint8 _decimals, uint256 _totalSupply) public {
       name = _name;
       symbol = _symbol;
       decimals = _decimals;
-      totalSupply = _totalSupply;
-      balances[msg.sender] = totalSupply;
+      totalSupply_ = _totalSupply;
+      balances[msg.sender] = totalSupply_;
     }
 
     function totalSupply() public view returns (uint256) {
-      return totalSupply;
+      return totalSupply_;
     }
 
     function balanceOf(address _owner) public view returns (uint256) {
@@ -41,24 +42,24 @@ contract ERC20 {
     function _approve(address spender, uint256 value) internal returns (bool) {
       require(balances[msg.sender] >= value);
       allowed[msg.sender][spender] = value;
-      Approval(msg.sender, spender, value);
+      emit Approval(msg.sender, spender, value);
       return true;
     }
 
     function _decreaseApproval(address spender, uint subtractedValue) internal returns (bool) {
       if(allowed[msg.sender][spender] <= subtractedValue) {
-        delete allowed[msg.sender];
+        delete allowed[msg.sender][spender];
       } else {
         allowed[msg.sender][spender] = allowed[msg.sender][spender].sub(subtractedValue);
       }
-      Approval(msg.sender, spender, allowed[msg.sender][spender]);
+      emit Approval(msg.sender, spender, allowed[msg.sender][spender]);
       return true;
     }
 
     function _increaseApproval(address spender, uint addedValue) internal returns (bool) {
       require(balances[msg.sender].sub(allowed[msg.sender][spender]) >= addedValue);
       allowed[msg.sender][spender] = allowed[msg.sender][spender].add(addedValue);
-      Approval(msg.sender, spender, allowed[msg.sender][spender]);
+      emit Approval(msg.sender, spender, allowed[msg.sender][spender]);
       return true;
     }
 
@@ -82,9 +83,10 @@ contract ERC20 {
       return true;
     }
 
+
     function _mint(address to, uint256 amount) internal returns (bool) {
       require(couldMint);
-      totalSupply = totalSupply.add(amount);
+      totalSupply_ = totalSupply_.add(amount);
       balances[to] = balances[to].add(amount);
       emit Mint(to, amount);
       emit Transfer(address(0), to, amount);
@@ -98,7 +100,7 @@ contract ERC20 {
     function _burn(address who, uint256 value) internal returns (bool){
       require(value <= balances[who]);
       balances[who] = balances[who].sub(value);
-      totalSupply = totalSupply.sub(value);
+      totalSupply_ = totalSupply_.sub(value);
       emit Burn(who, value);
       emit Transfer(who, address(0), value);
     }

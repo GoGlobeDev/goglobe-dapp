@@ -1,6 +1,7 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.23;
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
+import "./GOGBoardAccessor.sol";
 
 contract Lawyer is GOGBoardAccessor {
 

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.23;
 
 import 'zeppelin-solidity/contracts/math/SafeMath.sol';
 import './GOGBoard.sol';
@@ -46,7 +46,7 @@ contract GOGBoardAccessor {
   // @dev set GOGBoard contract. Only when gogBoard is empty
   // @param _gogBoard to be set.
   function setGOGBoard(address _gogBoard)
-      public {
+      public onlyAdmin{
     require(address(_gogBoard) != address(0));
     GOGBoard myGOGBoard = GOGBoard(_gogBoard);
     require(myGOGBoard.supportsGOGBoard() == "GOGBOARD");
@@ -55,7 +55,7 @@ contract GOGBoardAccessor {
 
   // @dev reset GOGBoard contract.
   function resetGOGBoard()
-      public {
+      public onlyAdmin{
     require(address(gogBoard) != address(0) && msg.sender == gogBoard.owner());
     delete gogBoard;
   }
@@ -64,7 +64,7 @@ contract GOGBoardAccessor {
   function getGOGBoard()
       public
       view
-      onlyGOGSystemAccounts
+      onlyBoardMember
       returns(address) {
     return address(gogBoard);
   }

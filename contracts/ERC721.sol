@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.23;
 
 import 'zeppelin-solidity/contracts/math/SafeMath.sol';
 import './GOGBoard.sol';
@@ -17,14 +17,16 @@ contract ERC721 {
   mapping (address => uint256[]) internal ownedTokens;
   mapping (address => mapping (address => bool)) internal operatorApprovals;
 
-  event ApprovalForAll(address indexed _owner, address indexd _operator, bool _approved);
+  event ApprovalForAll(address indexed _owner, address indexed _operator, bool _approved);
   event Transfer(address indexed _from, address indexed _to, uint256 _tokenId);
   event Approval(address indexed _owner, address indexed _approved, uint256 _tokenId);
 
   modifier canTransfer (uint256 _tokenId) {
+    _;
   }
 
-  modifier onlyOwnerOf (uint 256 _tokenId) {
+  modifier onlyOwnerOf (uint256 _tokenId) {
+    _;
   }
 
   function isApprovedOrOwner() public view returns (bool){

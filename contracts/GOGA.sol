@@ -1,8 +1,10 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.23;
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
+import "./GOGBoardAccessor.sol";
+import "./ERC721.sol";
 
-contract GOGA is ERC721,OGBoardAccessor {
+contract GOGA is ERC721,GOGBoardAccessor {
 
     using SafeMath for uint256;
 
@@ -13,7 +15,7 @@ contract GOGA is ERC721,OGBoardAccessor {
     mapping(uint256 => Asset) assetInfo;
     mapping(uint256 => uint256) projectToAsset;
 
-    function createAsset() public onlyGOGSystemAccounts {
+    function createAsset() public {
 
     }
 

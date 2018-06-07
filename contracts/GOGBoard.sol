@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.23;
 
 import "zeppelin-solidity/contracts/math/SafeMath.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -12,7 +12,7 @@ contract GOGBoard is Ownable {
     struct BoardMember{
       address memberAddress;
       uint memberTime;
-      String memberName;
+      string memberName;
     }
 
     /**
@@ -36,7 +36,7 @@ contract GOGBoard is Ownable {
     uint8 constant EXECUTE_RESULT_FAIL = 0;
     uint8 constant EXECUTE_RESULT_SUCCESS = 1;
     bytes32 constant SUPPORT = "GOGBOARD";
-    bool pause;
+    bool gogPause;
     uint minutesForDebate;
     uint minimumQuorumForProposals;
     uint sGMarginOfVotesForMajority;
@@ -62,7 +62,7 @@ contract GOGBoard is Ownable {
     *  only boardMember could operate
     */
     modifier onlyBoardMember {
-      require(memberId[msg.sender] != 0x0);
+      require(memberToIndex[msg.sender] != 0x0);
       _;
     }
 
@@ -70,7 +70,7 @@ contract GOGBoard is Ownable {
     *  only the contract not pause
     */
     modifier whenIsNotPaused {
-      require(!pause);
+      require(!gogPause);
       _;
     }
 
@@ -119,23 +119,23 @@ contract GOGBoard is Ownable {
       minutesForDebate = _minutesForDebate;
       chairMan = msg.sender;
       secretaryGeneral = msg.sender;
-      BoardMember boardMemberNull = BoardMember ({
+      BoardMember memory boardMemberNull = BoardMember ({
         memberAddress:address(0),
         memberTime:now,
         memberName:"null"
       });
       boardMembers.push(boardMember);
-      BoardMember boardMember = BoardMember ({
+      BoardMember memory boardMember = BoardMember ({
         memberAddress:msg.sender,
         memberTime:now,
         memberName:_memberName
       });
       uint length = boardMembers.push(boardMember);
       memberToIndex[msg.sender] = length - 1;
-      pause = false;
+      gogPause = false;
     }
 
-    function supportsGOGBoard() public view returns(bytes) {
+    function supportsGOGBoard() public view returns(bytes32) {
       return SUPPORT;
     }
 
@@ -185,61 +185,61 @@ contract GOGBoard is Ownable {
       return systemAddress[_systemAddress];
     }
 
-    function vote(uint8 type, bool isAgree) public onlyMember whenCorrectType(type) {
-      Propose storage propose = voteToPropose[type];
-      require (propose.isVoting == true && propose.voted[msg.sender] == false)
+    function vote(uint8 _type, bool isAgree) public onlyBoardMember whenCorrectType(_type) {
+      Propose storage propose = voteToPropose[_type];
+      require(propose.isVoting == true && propose.voted[msg.sender] == false);
       propose.numberOfVotes += 1;
       if (isAgree) {
         propose.agree += 1;
       }
-      emit VoteEvent(msg.sender, type, isAgree);
+      emit VoteEvent(msg.sender,_type, isAgree);
     }
 
-    function propose (uint8 type, address memberVoted, string _votedName) public onlyMember whenCorrectType(type) {
+    function createPropose(uint8 _type, address memberVoted, string _votedName) public onlyBoardMember whenCorrectType(_type) {
       require(address(0) != memberVoted);
-      Propose oldPropose = voteToPropose[type];
+      Propose storage oldPropose = voteToPropose[_type];
       require(!oldPropose.isVoting);
-      Propose propose = Propose({
+      Propose memory propose = Propose({
         numberOfVotes: 0,
         agree: 0,
         startTime: now,
-        endTime: now + debatingPeriodInMinutes * 1 minutes,
+        endTime: now + minutesForDebate * 1 minutes,
         isVoting: true,
         votedAddress: memberVoted,
         votedName: _votedName
       });
-      voteToPropose[type] = propose;
-      emit ProposeEvent(msg.sender, type, memberVoted);
+      voteToPropose[_type] = propose;
+      emit ProposeEvent(msg.sender, _type, memberVoted);
     }
 
-    function execute(uint8 type) public onlyMember whenCorrectType(type) {
-      Propose propose = voteToPropose[type];
-      require(propose.isVoting == true && now >= endTime);
+    function execute(uint8 _type) public onlyBoardMember whenCorrectType(_type) {
+      Propose storage propose = voteToPropose[_type];
+      require(propose.isVoting == true && now >= propose.endTime);
       uint8 executeResult = EXECUTE_RESULT_SUCCESS;
       uint disAgreeNumber = propose.numberOfVotes.sub(propose.agree);
-      if (minimumQuorumForProposals > voteToPropose.numberOfVotes || propose.agree < disAgreeNumber) {
+      if (minimumQuorumForProposals > propose.numberOfVotes || propose.agree < disAgreeNumber) {
         executeResult = EXECUTE_RESULT_FAIL;
       } else {
         uint margin = propose.agree - disAgreeNumber;
-        if(TYPE_ADD == type) {
+        if(TYPE_ADD == _type) {
           if (margin >= addMarginOfVotesForMajority) {
             _addMember(propose.votedAddress, propose.votedName);
           } else {
             executeResult = EXECUTE_RESULT_FAIL;
           }
-        } else if(TYPE_DELETE == type) {
+        } else if(TYPE_DELETE == _type) {
           if(margin >= deleteMarginOfVotesForMajority) {
             _removeMember(propose.votedAddress);
           } else {
             executeResult = EXECUTE_RESULT_FAIL;
           }
-        } else if(TYPE_UPDATE_CHAIRMAN == type) {
+        } else if(TYPE_UPDATE_CHAIRMAN == _type) {
           if (margin >= cMMarginOfVotesForMajority) {
             _updateChairMan(propose.votedAddress);
           } else {
             executeResult = EXECUTE_RESULT_FAIL;
           }
-        } else if (TYPE_UPDATE_SECRETARYGENERAL == type) {
+        } else if (TYPE_UPDATE_SECRETARYGENERAL == _type) {
           if (margin >= sGMarginOfVotesForMajority) {
             _updateSecretaryGeneral(propose.votedAddress);
           } else {
@@ -247,15 +247,15 @@ contract GOGBoard is Ownable {
           }
         }
       }
-      _deleteVoted(type, executeResult);
+      _deleteVoted(_type, executeResult);
     }
 
     function isChairMan(address _chairManAddress) public view returns (bool) {
-      return chairManAddress == _chairManAddress;
+      return chairMan == _chairManAddress;
     }
 
     function isSecretaryGeneral(address _secretaryGeneralAddress) public  view returns (bool) {
-      return secretaryGeneralAddress == _secretaryGeneralAddress;
+      return secretaryGeneral == _secretaryGeneralAddress;
     }
 
     function isBoardMember(address boardMember) public view returns (bool) {
@@ -263,33 +263,33 @@ contract GOGBoard is Ownable {
     }
 
     function pause () public onlyAdmin {
-      pause = true;
+      gogPause = true;
       emit Pause(msg.sender);
     }
 
     function unPause() public onlyAdmin {
-      pause = false;
+      gogPause = false;
       emit UnPause(msg.sender);
     }
 
     function isPaused() public view returns (bool) {
-      return pause;
+      return gogPause;
     }
 
     function _addMember(address targetMember, string _memberName) private  {
-      BoardMember boardMember = BoardMember ({
+      BoardMember memory boardMember = BoardMember ({
         memberAddress:msg.sender,
         memberTime:now,
         memberName:_memberName
       });
-      uint length = boasrdMember.push(boardMember);
+      uint length = boardMembers.push(boardMember);
       memberToIndex[targetMember] = length - 1;
       emit AddMember(msg.sender, targetMember);
     }
 
     function _removeMember(address targetMember) private {
       uint location = memberToIndex[targetMember];
-      delete boasrdMember[location];
+      delete boardMembers[location];
       delete memberToIndex[targetMember];
       emit DeleteMember(msg.sender, targetMember);
     }
@@ -304,11 +304,14 @@ contract GOGBoard is Ownable {
       emit UpdateSecretaryGeneral(msg.sender, targetMember);
     }
 
-    function _deleteVoted(uint8 type, uint8 executeResult) private {
-      Propose storage propose = voteToPropose[type];
-      delete propose.voted;
-      delete voteToPropose[type];
-      emit DeletePropose(msg.sender, type, executeResult);
+    function _deleteVoted(uint8 _type, uint8 executeResult) private {
+      Propose storage propose = voteToPropose[_type];
+      for (uint i = 0; i < boardMembers.length; i++) {
+        delete propose.voted[boardMembers[i].memberAddress];
+      }
+
+      delete voteToPropose[_type];
+      emit DeletePropose(msg.sender, _type, executeResult);
     }
 
 }
