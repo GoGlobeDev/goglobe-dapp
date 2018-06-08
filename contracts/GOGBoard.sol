@@ -309,7 +309,6 @@ contract GOGBoard is Ownable {
       for (uint i = 0; i < boardMembers.length; i++) {
         delete propose.voted[boardMembers[i].memberAddress];
       }
-
       delete voteToPropose[_type];
       emit DeletePropose(msg.sender, _type, executeResult);
     }

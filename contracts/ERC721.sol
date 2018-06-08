@@ -28,6 +28,7 @@ contract ERC721 {
   }
 
   modifier onlyOwnerOf (uint256 _tokenId) {
+    require(msg.sender == ownerOf(_tokenId));
     _;
   }
 
@@ -111,12 +112,23 @@ contract ERC721 {
     require(ownerOf(_tokenId) == _from);
     ownedTokensCount[_from] = ownedTokensCount[_from].sub(1);
     tokenOwner[_tokenId] = address(0);
+    uint256 tokenIndex = ownedTokensIndex[_tokenId];
+    uint256 lastTokenIndex = ownedTokens[_from].length.sub(1);
+    uint256 lastToken = ownedTokens[_from][lastTokenIndex];
+    ownedTokens[_from][tokenIndex] = lastToken;
+    ownedTokens[_from][lastTokenIndex] = 0;
+    ownedTokens[_from].length --;
+    ownedTokensIndex[_tokenId] = 0;
+    ownedTokensIndex[lastToken] = tokenIndex;
   }
 
   function _addTokenTo(address _to, uint256 _tokenId) internal {
     require(tokenOwner[_tokenId] == address(0));
     tokenOwner[_tokenId] = _to;
     ownedTokensCount[_to] = ownedTokensCount[_to].add(1);
+    uint256 length = ownedTokens[_to].length;
+    ownedTokens[_to].push(_tokenId);
+    ownedTokensIndex[_tokenId] = length;
   }
 
   function _transferFrom(address _from, address _to, uint256 _tokenId) internal canTransfer(_tokenId) {
@@ -132,11 +144,21 @@ contract ERC721 {
     require(address(0) != _to);
     _addTokenTo(_to, _tokenId);
     emit Transfer(address(0), _to, _tokenId);
+    allTokensIndex[_tokenId] = allTokens.length;
+    allTokens.push(_tokenId);
   }
 
   function _burn(address _owner, uint256 _tokenId) internal {
     _clearApproval(_owner, _tokenId);
     _removeTokenFrom(_owner, _tokenId);
     emit Transfer(_owner, address(0), _tokenId);
+    uint256 tokenIndex = allTokensIndex[_tokenId];
+    uint256 lastTokenIndex = allTokens.length.sub(1);
+    uint256 lastToken = allTokens[lastTokenIndex];
+    allTokens[tokenIndex] = lastToken;
+    allTokens[lastTokenIndex] = 0;
+    allTokens.length --;
+    allTokensIndex[_tokenId] = 0;
+    allTokensIndex[lastToken] = tokenIndex;
   }
 }

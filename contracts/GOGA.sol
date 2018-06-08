@@ -13,9 +13,9 @@ contract GOGA is ERC721,GOGBoardAccessor {
     }
 
     mapping(uint256 => Asset) assetInfo;
-    mapping(uint256 => uint256) projectToAsset;
+    mapping(uint256 => uint256[]) projectToAsset;
 
-    function createAsset() public {
+    function createAsset(uint256 project) public {
 
     }
 
