@@ -1,6 +1,6 @@
 pragma solidity ^0.4.23;
 
-import "zeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./GOGT.sol";
 
 contract Exchange is GOGBoardAccessor {
@@ -9,8 +9,9 @@ contract Exchange is GOGBoardAccessor {
 
     bool exchangeFunctionPause = false;
     uint rate;
-    uint fee;
-    address beneficiary;
+    uint fee;              // 0 -10000 integer for gogT
+    address beneficiary;  //just for service charge
+    address payee;        //
     GOGT gogT;
 
     modifier whenFuntionNotPaused {
@@ -30,11 +31,19 @@ contract Exchange is GOGBoardAccessor {
       beneficiary = _beneficiary;
     }
 
-    function buyGOGT(uint gogValue) public payable whenNotPaused {
+    function buyGOGT() public payable whenNotPaused {
+      //msg.value trans to contract
+      /*this.transfer(msg.value);*/
+      uint total = msg.value * rate;
+      uint transFee = fee * total / 10000;
+      uint gogT = total - transFee;
+
 
     }
 
     function sellGOGT(uint gogValue) public payable whenNotPaused whenFuntionNotPaused {
+      uint transFee = fee * gogValue / 10000;
+      uint total = (gogValue - transFee) / rate; //eth
 
     }
 

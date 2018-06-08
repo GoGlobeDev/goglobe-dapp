@@ -6,6 +6,6 @@
   "license": "MIT",
   "dependencies": {
     "truffle-hdwallet-provider": "0.0.3",
-    "zeppelin-solidity": "1.8.0"
+    "openzeppelin-solidity": "1.10.0"
   }
 }

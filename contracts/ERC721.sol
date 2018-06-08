@@ -1,6 +1,6 @@
 pragma solidity ^0.4.23;
 
-import 'zeppelin-solidity/contracts/math/SafeMath.sol';
+import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 import './GOGBoard.sol';
 
 contract ERC721 {
@@ -23,6 +23,7 @@ contract ERC721 {
   event Approval(address indexed _owner, address indexed _approved, uint256 _tokenId);
 
   modifier canTransfer (uint256 _tokenId) {
+    require(_isApprovedOrOwner(msg.sender, _tokenId));
     _;
   }
 
@@ -118,7 +119,7 @@ contract ERC721 {
     ownedTokensCount[_to] = ownedTokensCount[_to].add(1);
   }
 
-  function _transferFrom(address _from, address _to, uint256 _tokenId) internal{
+  function _transferFrom(address _from, address _to, uint256 _tokenId) internal canTransfer(_tokenId) {
     require(address(0) != _from);
     require(address(0) != _to);
     _clearApproval(_from,_tokenId);
@@ -127,23 +128,15 @@ contract ERC721 {
     emit Transfer(_from, _to, _tokenId);
   }
 
-  function safeTransferFrom(address _from, address _to, uint256 _tokenId, bytes _data) internal {
-
+  function _mint(address _to, uint256 _tokenId) internal {
+    require(address(0) != _to);
+    _addTokenTo(_to, _tokenId);
+    emit Transfer(address(0), _to, _tokenId);
   }
 
-  function mint(address _to, uint256 _tokenId) internal {
+  function _burn(address _owner, uint256 _tokenId) internal {
+    _clearApproval(_owner, _tokenId);
+    _removeTokenFrom(_owner, _tokenId);
+    emit Transfer(_owner, address(0), _tokenId);
   }
-
-  function burn(address _owner, uint256 _tokenId) internal {
-
-  }
-
-  function safeTransferFrom (address _from, address _to, uint256 _tokenId) internal{
-
-  }
-
-  function checkAndCallSafeTransfer (address _from, address _to, uint256 _tokenId, bytes _data) internal returns (bool) {
-
-  }
-
 }
