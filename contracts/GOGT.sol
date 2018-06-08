@@ -35,11 +35,11 @@ contract GOGT is GOGBoardAccessor,ERC20 {
       _changeCouldMint(couldMint);
     }
 
-    function mint(address to, uint256 amount) public whenNotPaused onlyAdmin returns (bool) {
+    function mint(address to, uint256 amount) public whenNotPaused onlySystemAddress returns (bool) {
       return _mint(to, amount);
     }
 
-    function burn(address who, uint256 value) public whenNotPaused onlyAdmin returns (bool) {
+    function burn(address who, uint256 value) public whenNotPaused onlySystemAddress returns (bool) {
       return _burn(who, value);
     }
 }
