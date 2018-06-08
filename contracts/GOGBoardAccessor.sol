@@ -38,8 +38,8 @@ contract GOGBoardAccessor {
     _;
   }
 
-  modifier onlySystemAddress(address _systemAddress) {
-    require(isSystemAddress(_systemAddress));
+  modifier onlySystemAddress {
+    require(isSystemAddress(msg.sender));
     _;
   }
 

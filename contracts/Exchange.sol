@@ -10,7 +10,7 @@ contract Exchange is GOGBoardAccessor {
     bool exchangeFunctionPause = false;
     uint256 rate;
     uint256 fee;              // 0 -10000 integer for gogT
-    uint256 minimumEth;      //the minimum eth you could transfer
+    uint256 minimumWei;      //the minimum wei you could transfer
     address beneficiary;    //just for service charge
     address payee;        //the one who has the gogT
     GOGT gogT;
@@ -49,25 +49,25 @@ contract Exchange is GOGBoardAccessor {
 
     function updateGOGTAddress(address gogTAddress) public whenNotPaused onlyAdmin {
       require(address(0) != gogTAddress);
-      gogT = gogTAddress;
+      gogT = GOGT(gogTAddress);
     }
 
-    function updateMinimumEth(uint256 _minimumEth) public whenNotPaused onlyAdmin {
-      require(_minimumEth > 0);
-      minimumEth = _minimumEth;
+    function updateMinimumWei(uint256 _minimumWei) public whenNotPaused onlyAdmin {
+      require(_minimumWei > 0);
+      minimumWei = _minimumWei;
     }
 
-    function checkBalance() public view onlyBoardMember {
+    function checkBalance() public view onlyBoardMember returns(uint){
       return address(this).balance;
     }
 
     function buyGOGT() public payable whenNotPaused {
       //msg.value trans to contract
       /*this.transfer(msg.value);*/
-      require(msg.value > minimumEth ether);
+      require(msg.value >= minimumWei);
       uint total = msg.value.mul(rate);
       uint transFee = total.mul(fee).div(10000);
-      uint gogTValue = total - transFee;
+      uint gogTValue = total.sub(transFee);
       gogT.burn(payee, total);
       gogT.mint(beneficiary, transFee);
       gogT.mint(msg.sender, gogTValue);
@@ -77,10 +77,11 @@ contract Exchange is GOGBoardAccessor {
     function sellGOGT(uint gogValue) public payable whenNotPaused whenFuntionNotPaused {
       uint transFee = fee.mul(gogValue).div(10000);
       uint total = gogValue.sub(transFee).div(rate); //eth
+      require(total >= minimumWei);
       require(address(this).balance >= total);
       gogT.burn(msg.sender, gogValue);
       gogT.mint(beneficiary, transFee);
-      gogT.mint(payee, gogTValue);
+      gogT.mint(payee, gogValue.sub(transFee));
       msg.sender.transfer(total);
       emit SellGOGT(msg.sender, total, transFee, gogValue);
     }
