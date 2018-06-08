@@ -11,11 +11,16 @@ contract GOGA is GOGBoardAccessor {
     mapping(uint => uint) pToA;
     GOGA gogA;
 
-    function createPFromA() public {
+    function updateGogA(address gogAAddress) public whenNotPaused onlyAdmin{
+      require(address(0) != gogAAddress);
+      gogA = GOGA(gogAAddress);
+    }
+
+    function createPFromA() public whenNotPaused{
 
     }
 
-    function mergePToA() public {
+    function mergePToA() public whenNotPaused {
 
     }
 
