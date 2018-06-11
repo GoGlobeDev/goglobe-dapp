@@ -100,11 +100,11 @@ contract GOGBoard is Ownable {
     /**
      * Constructor function
      */
-    function GOGBoard (
-      uint _sGMarginOfVotesForMajority,
+    constructor(
       uint _minimumQuorumForProposals,
       uint _addMarginOfVotesForMajority,
       uint _deleteMarginOfVotesForMajority,
+      uint _sGMarginOfVotesForMajority,
       uint _cMMarginOfVotesForMajority,
       uint _minutesForDebate,
       string _memberName
@@ -124,7 +124,7 @@ contract GOGBoard is Ownable {
         memberTime:now,
         memberName:"null"
       });
-      boardMembers.push(boardMember);
+      boardMembers.push(boardMemberNull);
       BoardMember memory boardMember = BoardMember ({
         memberAddress:msg.sender,
         memberTime:now,
@@ -135,7 +135,7 @@ contract GOGBoard is Ownable {
       gogPause = false;
     }
 
-    function supportsGOGBoard() public view returns(bytes32) {
+    function supportsGOGBoard() public pure returns(bytes32) {
       return SUPPORT;
     }
 

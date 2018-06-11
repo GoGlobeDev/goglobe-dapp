@@ -19,8 +19,8 @@ contract GOGA is ERC721,GOGBoardAccessor {
 
     constructor(string _name, string _symbol) ERC721(_name, _symbol) public {}
 
-    function getProjectByTokenId(uint tokenId) public view returns (uint) {
-      return assetToProject[tokenId];
+    function getProjectByTokenId(uint _tokenId) public view returns (uint) {
+      return assetToProject[_tokenId];
     }
 
     function createAsset(uint256 projectId, string _name) public whenNotPaused {

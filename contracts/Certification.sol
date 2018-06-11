@@ -38,9 +38,9 @@ contract Certification is GOGBoardAccessor {
       operator = Operator(operatorAddress);
     }
 
-    function udpateGOGA(address _gogA) public whenNotPaused onlyAdmin() {
+    function updateGOGA(address _gogA) public whenNotPaused onlyAdmin {
       require(address(0) != _gogA);
-      gogA != _gogA;
+      gogA = GOGA(_gogA);
     }
 
     function certificateByLawyer(address lawyerAddress, uint256 projectTokenId) public whenNotPaused onlyLawyer returns (bool){
