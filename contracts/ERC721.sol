@@ -79,7 +79,7 @@ contract ERC721 {
     return owner != address(0);
   }
 
-  function approve(address _to, uint256 _tokenId) internal {
+  function _approve(address _to, uint256 _tokenId) internal {
     address owner = ownerOf(_tokenId);
     require(_to != owner);
     require(msg.sender == owner || isApprovedForAll(owner,msg.sender));

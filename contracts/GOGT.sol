@@ -8,8 +8,7 @@ contract GOGT is GOGBoardAccessor,ERC20 {
 
     using SafeMath for uint256;
 
-    constructor(string _name, string _symbol, uint8 _decimals, uint256 _totalSupply) ERC20(_name, _symbol, _decimals, _totalSupply) public {
-    }
+    constructor(string _name, string _symbol, uint8 _decimals, uint256 _totalSupply) ERC20(_name, _symbol, _decimals, _totalSupply) public {}
 
     function approve(address spender, uint256 value) public whenNotPaused returns (bool) {
       return _approve(spender,value);

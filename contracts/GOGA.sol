@@ -7,21 +7,28 @@ import "./ERC721.sol";
 contract GOGA is ERC721,GOGBoardAccessor {
 
     using SafeMath for uint256;
-
     struct Asset {
       string name;
     }
 
+    uint256 tokenId = 1;
     mapping(uint256 => Asset) assetInfo;
     mapping(uint256 => uint256[]) projectToAsset;
     mapping(uint256 => uint256) assetToProject;
-    mapping(uint256 => uint256) assetToProjectIndex;
+    mapping(uint256 => uint256) assetInProjectIndex;
+
+    constructor(string _name, string _symbol) ERC721(_name, _symbol) public {}
+
+    function getProjectByTokenId(uint tokenId) public view returns (uint) {
+      return assetToProject[tokenId];
+    }
 
     function createAsset(uint256 projectId, string _name) public whenNotPaused {
-      uint256 tokenId = totalSupply();
-      _mint(msg.sender, tokenId);
+      uint tokenId_ = ++tokenId;
+      require(exists(tokenId_));
+      _mint(msg.sender, tokenId_);
       uint length = projectToAsset[projectId].push(tokenId);
-      assetToProjectIndex[tokenId] = length.sub(1);
+      assetInProjectIndex[tokenId] = length.sub(1);
       assetToProject[tokenId] = projectId;
       Asset memory asset = Asset({
         name: _name
@@ -29,4 +36,16 @@ contract GOGA is ERC721,GOGBoardAccessor {
       assetInfo[tokenId] = asset;
     }
 
+    function updateTokenId(uint256 _tokenId) public whenNotPaused onlyAdmin {
+      require(_tokenId > tokenId);
+      tokenId = _tokenId;
+    }
+
+    function burn(address _owner, uint256 _tokenId) public whenNotPaused onlySystemAddress {
+      _burn(_owner, _tokenId);
+    }
+
+    function mint(address _to, uint256 _tokenId) public whenNotPaused onlySystemAddress {
+      _mint(_to, _tokenId);
+    }
 }
