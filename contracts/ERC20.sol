@@ -10,7 +10,7 @@ contract ERC20 {
     string symbol;
     uint8 decimals;
     uint256 totalSupply_;
-    bool couldMint = false;
+    bool couldMint = true;
     mapping (address => uint256) balances;
     mapping (address => mapping (address => uint256)) internal allowed;
 

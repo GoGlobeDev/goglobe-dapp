@@ -12,6 +12,8 @@ module.exports = async function (deployer) {
   gogBoard = await GOGBoard.deployed();
   exchange = await Exchange.deployed();
   gogTAddress = await gogT.deployed();
+  await gogTAddress.setGOGBoard(gogBoard.address);
   await exchange.setGOGBoard(gogBoard.address);
   await exchange.updateGOGTAddress(gogTAddress.address);
+  await gogBoard.addSystemAddress(exchange.address);
 };
