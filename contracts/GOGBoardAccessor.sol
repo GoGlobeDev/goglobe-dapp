@@ -45,8 +45,14 @@ contract GOGBoardAccessor {
 
   // @dev set GOGBoard contract. Only when gogBoard is empty
   // @param _gogBoard to be set.
-  function setGOGBoard(address _gogBoard)
-      public onlyAdmin{
+  function setGOGBoard(address _gogBoard) public {
+    require(address(gogBoard) == address(0));
+    GOGBoard myGOGBoard = GOGBoard(_gogBoard);
+    require(myGOGBoard.supportsGOGBoard() == "GOGBOARD");
+    gogBoard = myGOGBoard;
+  }
+
+  function setGOGBoardOnlyByAdmin(address _gogBoard) public onlyAdmin {
     require(address(_gogBoard) != address(0));
     GOGBoard myGOGBoard = GOGBoard(_gogBoard);
     require(myGOGBoard.supportsGOGBoard() == "GOGBOARD");

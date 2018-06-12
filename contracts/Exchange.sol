@@ -86,6 +86,9 @@ contract Exchange is GOGBoardAccessor {
       emit SellGOGT(msg.sender, total, transFee, gogValue);
     }
 
+    /**
+    *  admin withDraw the eth
+    */
     function withDraw(uint256 value) public payable whenNotPaused onlyAdmin{
       require(value <= address(this).balance);
       msg.sender.transfer(value);
