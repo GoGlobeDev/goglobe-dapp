@@ -24,9 +24,9 @@ contract GOGA is ERC721,GOGBoardAccessor {
     }
 
     function createAsset(uint256 projectId, string _name) public whenNotPaused {
-      uint tokenId_ = ++tokenId;
-      require(exists(tokenId_));
-      _mint(msg.sender, tokenId_);
+      tokenId = tokenId.add(1);
+      require(exists(tokenId));
+      _mint(msg.sender, tokenId);
       uint length = projectToAsset[projectId].push(tokenId);
       assetInProjectIndex[tokenId] = length.sub(1);
       assetToProject[tokenId] = projectId;

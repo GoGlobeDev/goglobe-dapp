@@ -17,8 +17,9 @@ contract Operator is GOGBoardAccessor {
     uint length;
 
 
-    function addOperator(address operatorAddress) public whenNotPaused onlyAdmin returns (uint256){
-      operators[operatorAddress] = tokenId++;
+    function addOperator(address operatorAddress) public whenNotPaused onlyAdmin returns (uint256
+      tokenId = tokenId.add(1);
+      operators[operatorAddress] = tokenId;
       OperatorInfo memory operatorInfo = OperatorInfo({
         isActive: true
       });

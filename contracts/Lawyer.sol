@@ -16,7 +16,8 @@ contract Lawyer is GOGBoardAccessor {
     mapping (uint => LawyerInfo) lawyerInfos;
 
     function addLawyer(address lawyerAddress) public whenNotPaused onlyAdmin returns (uint256){
-      lawyers[lawyerAddress] = tokenId++;
+      tokenId = tokenId.add(1);
+      lawyers[lawyerAddress] = tokenId;
       LawyerInfo memory lawyerInfo = LawyerInfo({
         isActive: true
       });

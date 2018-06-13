@@ -28,8 +28,8 @@ contract GOGAP is GOGBoardAccessor,ERC721 {
     }
 
     function createPFromA(uint256 gogATokenId, uint256 copies) public whenNotPaused onlyOwnerOfGOGA(gogATokenId) returns(uint256[]){
-      uint tokenId_ = ++tokenId;
-      require(exists(tokenId_));
+      tokenId = tokenId.add(1);
+      require(!exists(tokenId));
       uint[] memory resTokenId = new uint[](copies);
       for (uint i = 0; i < copies; i++) {
         tokenId = tokenId.add(i);
