@@ -11,11 +11,13 @@ contract GOGA is ERC721,GOGBoardAccessor {
       string name;
     }
 
-    uint256 tokenId = 1;
+    uint256 tokenId;
     mapping(uint256 => Asset) assetInfo;
     mapping(uint256 => uint256[]) projectToAsset;
     mapping(uint256 => uint256) assetToProject;
     mapping(uint256 => uint256) assetInProjectIndex;
+
+    event CreateAsset(address indexed _operator, uint256 indexed _projectId, string _name);
 
     constructor(string _name, string _symbol) ERC721(_name, _symbol) public {}
 
@@ -23,9 +25,10 @@ contract GOGA is ERC721,GOGBoardAccessor {
       return assetToProject[_tokenId];
     }
 
-    function createAsset(uint256 projectId, string _name) public whenNotPaused {
+    function createAsset(uint256 projectId, string _name) public whenNotPaused returns(uint256){
+      require(projectId > 0);
       tokenId = tokenId.add(1);
-      require(exists(tokenId));
+      require(!exists(tokenId));
       _mint(msg.sender, tokenId);
       uint length = projectToAsset[projectId].push(tokenId);
       assetInProjectIndex[tokenId] = length.sub(1);
@@ -34,6 +37,8 @@ contract GOGA is ERC721,GOGBoardAccessor {
         name: _name
       });
       assetInfo[tokenId] = asset;
+      emit CreateAsset(msg.sender, projectId, _name);
+      return tokenId;
     }
 
     function updateTokenId(uint256 _tokenId) public whenNotPaused onlyAdmin {

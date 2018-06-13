@@ -11,7 +11,7 @@ contract Operator is GOGBoardAccessor {
       bool isActive;
     }
 
-    uint256 tokenId = 1;
+    uint256 tokenId;
     mapping (address => uint) operators;
     mapping (uint => OperatorInfo) operatorInfos;
 

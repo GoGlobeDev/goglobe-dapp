@@ -9,7 +9,7 @@ contract GOGAP is GOGBoardAccessor,ERC721 {
 
     using SafeMath for uint256;
 
-    uint256 tokenId = 1;
+    uint256 tokenId;
     mapping(uint => uint[]) aToP;
     mapping(uint => uint) pToA;
     mapping(uint => bool) pMerged;
@@ -20,7 +20,17 @@ contract GOGAP is GOGBoardAccessor,ERC721 {
       _;
     }
 
+    event CreatePFromA(address indexed _operator, uint indexed _aTokenId, uint copies);
+    event MergePToA(address indexed _operator, uint[] _copies);
     constructor(string _name, string _symbol) ERC721(_name, _symbol) public {}
+
+    function getPFromA(uint256 _tokenId) public view returns(uint256[]) {
+      return aToP[_tokenId];
+    }
+
+    function getAFromP(uint256 _pTokenId) public view returns(uint256) {
+      return pToA[_pTokenId];
+    }
 
     function updateGogA(address gogAAddress) public whenNotPaused onlyAdmin {
       require(address(0) != gogAAddress);
@@ -30,15 +40,17 @@ contract GOGAP is GOGBoardAccessor,ERC721 {
     function createPFromA(uint256 gogATokenId, uint256 copies) public whenNotPaused onlyOwnerOfGOGA(gogATokenId) returns(uint256[]){
       tokenId = tokenId.add(1);
       require(!exists(tokenId));
+      uint tokenId_ = tokenId;
       uint[] memory resTokenId = new uint[](copies);
       for (uint i = 0; i < copies; i++) {
-        tokenId = tokenId.add(i);
+        tokenId = tokenId_.add(i);
         _mint((address(this)), tokenId);
         resTokenId[i] = tokenId;
         pToA[tokenId] = gogATokenId;
         pMerged[tokenId] = true;
       }
       aToP[gogATokenId] = resTokenId;
+      emit CreatePFromA(msg.sender, gogATokenId, copies);
       return resTokenId;
     }
 
@@ -59,6 +71,7 @@ contract GOGAP is GOGBoardAccessor,ERC721 {
       for (uint k = 0; k < length; k++) {
         _burn(msg.sender,copies[k]);
       }
+      emit MergePToA(msg.sender, copies);
     }
 
     function updateTokenId(uint256 _tokenId) public whenNotPaused onlyAdmin {

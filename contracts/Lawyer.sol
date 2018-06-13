@@ -11,7 +11,7 @@ contract Lawyer is GOGBoardAccessor {
       bool isActive;
     }
 
-    uint256 tokenId = 1;
+    uint256 tokenId;
     mapping (address => uint) lawyers;
     mapping (uint => LawyerInfo) lawyerInfos;
 
