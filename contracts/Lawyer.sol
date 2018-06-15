@@ -9,17 +9,23 @@ contract Lawyer is GOGBoardAccessor {
 
     struct LawyerInfo {
       bool isActive;
+      string name;
+      string url;
+      string desc;
     }
 
     uint256 tokenId;
     mapping (address => uint) lawyers;
     mapping (uint => LawyerInfo) lawyerInfos;
 
-    function addLawyer(address lawyerAddress) public whenNotPaused onlyAdmin returns (uint256){
+    function addLawyer(address lawyerAddress, string _name, string _url, string _desc) public whenNotPaused onlyAdmin returns (uint256){
       tokenId = tokenId.add(1);
       lawyers[lawyerAddress] = tokenId;
       LawyerInfo memory lawyerInfo = LawyerInfo({
-        isActive: true
+        isActive: true,
+        name: _name,
+        url: _url,
+        desc: _desc
       });
       lawyerInfos[lawyers[lawyerAddress]] = lawyerInfo;
       return lawyers[lawyerAddress];

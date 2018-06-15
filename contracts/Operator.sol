@@ -9,17 +9,23 @@ contract Operator is GOGBoardAccessor {
 
     struct OperatorInfo {
       bool isActive;
+      string name;
+      string desc;
+      string url;
     }
 
     uint256 tokenId;
     mapping (address => uint) operators;
     mapping (uint => OperatorInfo) operatorInfos;
 
-    function addOperator(address operatorAddress) public whenNotPaused onlyAdmin returns (uint256){
+    function addOperator(address operatorAddress, string _name, string _desc, string _url) public whenNotPaused onlyAdmin returns (uint256){
       tokenId = tokenId.add(1);
       operators[operatorAddress] = tokenId;
       OperatorInfo memory operatorInfo = OperatorInfo({
-        isActive: true
+        isActive: true,
+        name: _name,
+        desc: _desc,
+        url: _url
       });
       operatorInfos[operators[operatorAddress]] = operatorInfo;
       return operators[operatorAddress];

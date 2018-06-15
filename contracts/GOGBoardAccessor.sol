@@ -94,4 +94,8 @@ contract GOGBoardAccessor {
   function isSystemAddress(address _systemAddress) public view returns (bool) {
     return gogBoard.isSystemAddress(_systemAddress);
   }
+
+  function isAdmin() public view returns (bool) {
+    return (isChairMan() || isSecretaryGeneral());
+  }
 }

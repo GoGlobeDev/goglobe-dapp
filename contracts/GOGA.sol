@@ -9,6 +9,10 @@ contract GOGA is ERC721,GOGBoardAccessor {
     using SafeMath for uint256;
     struct Asset {
       string name;
+      string country;
+      string city;
+      string location;
+      string url;
     }
 
     uint256 tokenId;
@@ -25,7 +29,7 @@ contract GOGA is ERC721,GOGBoardAccessor {
       return assetToProject[_tokenId];
     }
 
-    function createAsset(uint256 projectId, string _name) public whenNotPaused returns(uint256){
+    function createAsset(uint256 projectId, string _name, string _country, string _city, string _location, string _url) public whenNotPaused returns(uint256){
       require(projectId > 0);
       tokenId = tokenId.add(1);
       require(!exists(tokenId));
@@ -34,7 +38,11 @@ contract GOGA is ERC721,GOGBoardAccessor {
       assetInProjectIndex[tokenId] = length.sub(1);
       assetToProject[tokenId] = projectId;
       Asset memory asset = Asset({
-        name: _name
+        name: _name,
+        country: _country,
+        city: _city,
+        location: _location,
+        url: _url
       });
       assetInfo[tokenId] = asset;
       emit CreateAsset(msg.sender, projectId, _name);

@@ -4,6 +4,8 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./GOGBoardAccessor.sol";
 import "./ERC721.sol";
 import "./GOGA.sol";
+import "./Certification.sol";
+import "./GOGAuction.sol";
 
 contract GOGAP is GOGBoardAccessor,ERC721 {
 
@@ -14,9 +16,16 @@ contract GOGAP is GOGBoardAccessor,ERC721 {
     mapping(uint => uint) pToA;
     mapping(uint => bool) pMerged;
     GOGA gogA;
+    Certification certification;
+    GOGAuction gogAuction;
 
     modifier onlyOwnerOfGOGA(uint256 gogATokenId) {
       require(msg.sender == gogA.ownerOf(gogATokenId));
+      _;
+    }
+
+    modifier onlyGOGACertification(uint256 gogATokenId) {
+      require(certification.isCertificated(gogATokenId));
       _;
     }
 
@@ -37,17 +46,28 @@ contract GOGAP is GOGBoardAccessor,ERC721 {
       gogA = GOGA(gogAAddress);
     }
 
-    function createPFromA(uint256 gogATokenId, uint256 copies) public whenNotPaused onlyOwnerOfGOGA(gogATokenId) returns(uint256[]){
+    function updateCertification(address certificationAddress) public whenNotPaused onlyAdmin {
+      require(address(0) != certificationAddress);
+      certification = Certification(certificationAddress);
+    }
+
+    function updateGOGAuction(address gogAuctionAddress) public whenNotPaused onlyAdmin {
+      require(address(0) != gogAuctionAddress);
+      gogAuction = GOGAuction(gogAuctionAddress);
+    }
+
+    function createPFromA(uint256 gogATokenId, uint256 copies) public whenNotPaused onlyOwnerOfGOGA(gogATokenId) onlyGOGACertification(gogATokenId) returns(uint256[]){
       tokenId = tokenId.add(1);
       require(!exists(tokenId));
       uint tokenId_ = tokenId;
       uint[] memory resTokenId = new uint[](copies);
       for (uint i = 0; i < copies; i++) {
         tokenId = tokenId_.add(i);
-        _mint((address(this)), tokenId);
+        _mint(msg.sender, tokenId);
         resTokenId[i] = tokenId;
         pToA[tokenId] = gogATokenId;
         pMerged[tokenId] = true;
+        _approve(address(gogAuction), tokenId);
       }
       aToP[gogATokenId] = resTokenId;
       emit CreatePFromA(msg.sender, gogATokenId, copies);
@@ -77,5 +97,9 @@ contract GOGAP is GOGBoardAccessor,ERC721 {
     function updateTokenId(uint256 _tokenId) public whenNotPaused onlyAdmin {
       require(_tokenId > tokenId);
       tokenId = _tokenId;
+    }
+
+    function transferFrom(address _from, address _to, uint _tokenId) public onlySystemAddress{
+      _transferFrom(_from, _to, _tokenId);
     }
 }
