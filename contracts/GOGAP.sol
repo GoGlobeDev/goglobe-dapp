@@ -14,6 +14,7 @@ contract GOGAP is GOGBoardAccessor,ERC721 {
     uint256 tokenId;
     mapping(uint => uint[]) aToP;
     mapping(uint => uint) pToA;
+    //the split part whether or not merged
     mapping(uint => bool) pMerged;
     GOGA gogA;
     Certification certification;
@@ -29,8 +30,13 @@ contract GOGAP is GOGBoardAccessor,ERC721 {
       _;
     }
 
+    event UpdateGogA(address indexed _operator, address _gogAAddress);
+    event UpdateCertification(address indexed _operator, address _certificationAddress);
+    event UpdateGOGAuction(address indexed _operator, address _gogAuctionAddress);
+    event UpdateTokenId(address indexed _operator, uint _newTokenId);
     event CreatePFromA(address indexed _operator, uint indexed _aTokenId, uint copies);
     event MergePToA(address indexed _operator, uint[] _copies);
+
     constructor(string _name, string _symbol) ERC721(_name, _symbol) public {}
 
     function getPFromA(uint256 _tokenId) public view returns(uint256[]) {
@@ -44,16 +50,19 @@ contract GOGAP is GOGBoardAccessor,ERC721 {
     function updateGogA(address gogAAddress) public whenNotPaused onlyAdmin {
       require(address(0) != gogAAddress);
       gogA = GOGA(gogAAddress);
+      emit UpdateGogA(msg.sender, gogAAddress);
     }
 
     function updateCertification(address certificationAddress) public whenNotPaused onlyAdmin {
       require(address(0) != certificationAddress);
       certification = Certification(certificationAddress);
+      emit UpdateCertification(msg.sender, certificationAddress);
     }
 
     function updateGOGAuction(address gogAuctionAddress) public whenNotPaused onlyAdmin {
       require(address(0) != gogAuctionAddress);
       gogAuction = GOGAuction(gogAuctionAddress);
+      emit UpdateGOGAuction(msg.sender, gogAuctionAddress);
     }
 
     function createPFromA(uint256 gogATokenId, uint256 copies) public whenNotPaused onlyOwnerOfGOGA(gogATokenId) onlyGOGACertification(gogATokenId) returns(uint256[]){
@@ -97,6 +106,7 @@ contract GOGAP is GOGBoardAccessor,ERC721 {
     function updateTokenId(uint256 _tokenId) public whenNotPaused onlyAdmin {
       require(_tokenId > tokenId);
       tokenId = _tokenId;
+      emit UpdateTokenId(msg.sender, _tokenId);
     }
 
     function transferFrom(address _from, address _to, uint _tokenId) public onlySystemAddress{

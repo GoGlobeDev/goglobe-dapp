@@ -43,6 +43,8 @@ contract GOGBoardAccessor {
     _;
   }
 
+  event SetGOGBoard(address indexed _operator, address _gogBoard);
+
   // @dev set GOGBoard contract. Only when gogBoard is empty
   // @param _gogBoard to be set.
   function setGOGBoard(address _gogBoard) public {
@@ -50,6 +52,7 @@ contract GOGBoardAccessor {
     GOGBoard myGOGBoard = GOGBoard(_gogBoard);
     require(myGOGBoard.supportsGOGBoard() == "GOGBOARD");
     gogBoard = myGOGBoard;
+    emit SetGOGBoard(msg.sender, _gogBoard);
   }
 
   function setGOGBoardOnlyByAdmin(address _gogBoard) public onlyAdmin {
@@ -57,13 +60,7 @@ contract GOGBoardAccessor {
     GOGBoard myGOGBoard = GOGBoard(_gogBoard);
     require(myGOGBoard.supportsGOGBoard() == "GOGBOARD");
     gogBoard = myGOGBoard;
-  }
-
-  // @dev reset GOGBoard contract.
-  function resetGOGBoard()
-      public onlyAdmin{
-    require(address(gogBoard) != address(0) && msg.sender == gogBoard.owner());
-    delete gogBoard;
+    emit SetGOGBoard(msg.sender, _gogBoard);
   }
 
   // @dev get the address of the current gogBoard contract.

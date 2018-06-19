@@ -30,19 +30,40 @@ contract GOGAuction is GOGBoardAccessor{
     _;
   }
 
+  event UpdateGOGAP(address indexed _operator, address _gogAPAddress);
+  event UpdateGOGT(address indexed _operator, address _gogTAddress);
   event CreateAuction(address indexed _operator, uint indexed _tokenId, uint ethVlaue, uint gogValue);
   event CancleAuction(address indexed _operator, uint indexed _tokenId);
   event Bid(address indexed _operator, address indexed _seller, uint indexed _tokenId, uint ethVlaue, uint gogValue);
 
-  function updateGOGAP(address gogAPAddress) public onlyAdmin {
+  function updateGOGAP(address gogAPAddress) public whenNotPaused onlyAdmin {
     require(address(0) != gogAPAddress);
     gogAP = GOGAP(gogAPAddress);
+    emit UpdateGOGAP(msg.sender, gogAPAddress);
   }
 
-  function updateGOGT(address gogTAddress) public onlyAdmin {
+  function updateGOGT(address gogTAddress) public whenNotPaused onlyAdmin {
     require(address(0) != gogTAddress);
     gogT = GOGT(gogTAddress);
+    emit UpdateGOGT(msg.sender, gogTAddress);
+  }
 
+  function createAuction(uint _tokenId, uint _ethValue, uint _gogTValue, uint defaultDuration) public whenNotPaused{
+    _createAuction(_tokenId, _ethValue, _gogTValue, defaultDuration);
+  }
+
+  function createAuctionList(uint[] _tokenIds, uint _ethValue, uint _gogTValue, uint defaultDuration) public whenNotPaused onlyAdmin{
+    for (uint i = 0; i < _tokenIds.length; i ++) {
+      _createAuction(_tokenIds[i], _ethValue, _gogTValue, defaultDuration);
+    }
+  }
+
+  function cancleAuction(uint _tokenId) public whenNotPaused {
+    _cancleAuction(_tokenId);
+  }
+
+  function bid(uint _tokenId) public payable whenNotPaused {
+    _bid(_tokenId);
   }
 
   function _createAuction(uint _tokenId, uint _ethValue, uint _gogTValue, uint defaultDuration) private onlyOwnerOfGOGA(_tokenId){
@@ -79,23 +100,4 @@ contract GOGAuction is GOGBoardAccessor{
     emit Bid(msg.sender, auction.seller, _tokenId, auction.ethValue, auction.gogTValue);
     delete tokenToAuction[_tokenId];
   }
-
-  function createAuction(uint _tokenId, uint _ethValue, uint _gogTValue, uint defaultDuration) public whenNotPaused{
-    _createAuction(_tokenId, _ethValue, _gogTValue, defaultDuration);
-  }
-
-  function createAuctionList(uint[] _tokenIds, uint _ethValue, uint _gogTValue, uint defaultDuration) public whenNotPaused onlyAdmin{
-    for (uint i = 0; i < _tokenIds.length; i ++) {
-      _createAuction(_tokenIds[i], _ethValue, _gogTValue, defaultDuration);
-    }
-  }
-
-  function cancleAuction(uint _tokenId) public whenNotPaused {
-    _cancleAuction(_tokenId);
-  }
-
-  function bid(uint _tokenId) public payable whenNotPaused {
-    _bid(_tokenId);
-  }
-
 }

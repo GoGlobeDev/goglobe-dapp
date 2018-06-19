@@ -79,7 +79,7 @@ contract Certification is GOGBoardAccessor {
 
     function certificateByLawyer(uint256 projectTokenId) public whenNotPaused onlyLawyer returns (bool){
       lawyerToGOGAProject[lawyer.getTokenId(msg.sender)].push(projectTokenId);
-      gogAProjectToLawyer[projectTokenId] = lawyer.getTokenId(lawyerAddress);
+      gogAProjectToLawyer[projectTokenId] = lawyer.getTokenId(msg.sender);
       emit CertificateByLawyer(msg.sender, projectTokenId);
     }
 

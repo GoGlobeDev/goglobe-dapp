@@ -16,11 +16,16 @@ contract GOGA is ERC721,GOGBoardAccessor {
     }
 
     uint256 tokenId;
+    //tokenId to the Asset Info
     mapping(uint256 => Asset) assetInfo;
+    //project add tokenId
     mapping(uint256 => uint256[]) projectToAsset;
+    //tokenId to projectId
     mapping(uint256 => uint256) assetToProject;
+    //the location asset in project array
     mapping(uint256 => uint256) assetInProjectIndex;
 
+    event UpdateTokenId(address indexed _operator, uint _newTokenId);
     event CreateAsset(address indexed _operator, uint256 indexed _projectId, string _name);
 
     constructor(string _name, string _symbol) ERC721(_name, _symbol) public {}
@@ -49,9 +54,13 @@ contract GOGA is ERC721,GOGBoardAccessor {
       return tokenId;
     }
 
+    /**
+    * to avoid the tokenId wrong
+    */
     function updateTokenId(uint256 _tokenId) public whenNotPaused onlyAdmin {
       require(_tokenId > tokenId);
       tokenId = _tokenId;
+      emit UpdateTokenId(msg.sender, _tokenId);
     }
 
     function burn(address _owner, uint256 _tokenId) public whenNotPaused onlySystemAddress {

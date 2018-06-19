@@ -9,10 +9,14 @@ contract Exchange is GOGBoardAccessor {
 
     bool exchangeFunctionPause = false;
     uint256 rate;
-    uint256 fee;              // 0 -10000 integer for gogT
-    uint256 minimumWei;      //the minimum wei you could transfer
-    address beneficiary;    //just for service charge
-    address payee;        //the one who has the gogT
+    // 0 -10000 integer for gogT
+    uint256 fee;
+    //the minimum wei you could transfer
+    uint256 minimumWei;
+    //just for service charge
+    address beneficiary;
+    //the one who has the gogT
+    address payee;
     GOGT gogT;
 
     modifier whenFuntionNotPaused {
@@ -20,6 +24,12 @@ contract Exchange is GOGBoardAccessor {
       _;
     }
 
+    event UpdateRate(address indexed _operator, uint _rate);
+    event UpdateFee(address indexed _operator, uint _fee);
+    event UpdateBeneficiary(address indexed _operator, address _beneficiary);
+    event UpdatePayee(address indexed _operator, address _payee);
+    event UpdateGOGTAddress(address indexed _operator, address _gogTAddress);
+    event UpdateMinimumWei(address indexed _operator, uint _minimumWei);
     event BuyGOGT(address indexed _dealer, uint256 _ethValue, uint256 _fee, uint256 _gogTValue);
     event SellGOGT(address indexed _dealer, uint256 _ethValue, uint256 _fee, uint256 _gogTValue);
     event WithDraw(address indexed _dealer, uint256 _value);
@@ -29,36 +39,42 @@ contract Exchange is GOGBoardAccessor {
       fee = _fee;
     }
 
+    function checkBalance() public view onlyBoardMember returns(uint){
+      return address(this).balance;
+    }
+
     function updateRate(uint _rate) public whenNotPaused onlyAdmin {
       rate = _rate;
+      emit UpdateRate(msg.sender, _rate);
     }
 
     function updateFee(uint _fee) public whenNotPaused onlyAdmin {
       fee = _fee;
+      emit UpdateFee(msg.sender, _fee);
     }
 
     function updateBeneficiary(address _beneficiary) public whenNotPaused onlyAdmin{
       require(address(0) != _beneficiary);
       beneficiary = _beneficiary;
+      emit UpdateBeneficiary(msg.sender, _beneficiary);
     }
 
     function updatePayee(address _payee) public whenNotPaused onlyAdmin {
       require(address(0) != _payee);
       payee = _payee;
+      emit UpdatePayee(msg.sender, _payee);
     }
 
     function updateGOGTAddress(address gogTAddress) public whenNotPaused onlyAdmin {
       require(address(0) != gogTAddress);
       gogT = GOGT(gogTAddress);
+      emit UpdateGOGTAddress(msg.sender, gogTAddress);
     }
 
     function updateMinimumWei(uint256 _minimumWei) public whenNotPaused onlyAdmin {
       require(_minimumWei > 0);
       minimumWei = _minimumWei;
-    }
-
-    function checkBalance() public view onlyBoardMember returns(uint){
-      return address(this).balance;
+      emit UpdateMinimumWei(msg.sender, _minimumWei);
     }
 
     function buyGOGT() public payable whenNotPaused {

@@ -15,8 +15,15 @@ contract Operator is GOGBoardAccessor {
     }
 
     uint256 tokenId;
+    //address to tokenId
     mapping (address => uint) operators;
+    //tokenId to the lawyerInfo
     mapping (uint => OperatorInfo) operatorInfos;
+
+    event AddOperator(address indexed _admin, address _operatorAddress, uint _tokenId, string _name);
+    event TerminateOperator(address indexed _admin, address _operatorAddress);
+    event ActiveOperator(address indexed _admin, address _operatorAddress);
+    event ChangeAddress(address indexed _admin, address indexed _changeAddress, uint indexed _tokenId);
 
     function addOperator(address operatorAddress, string _name, string _desc, string _url) public whenNotPaused onlyAdmin returns (uint256){
       tokenId = tokenId.add(1);
@@ -28,15 +35,18 @@ contract Operator is GOGBoardAccessor {
         url: _url
       });
       operatorInfos[operators[operatorAddress]] = operatorInfo;
-      return operators[operatorAddress];
+      emit AddOperator(msg.sender, operatorAddress, tokenId, _name);
+      return tokenId;
     }
 
     function terminateOperator(address operatorAddress) public whenNotPaused onlyAdmin{
       operatorInfos[operators[operatorAddress]].isActive = false;
+      emit TerminateOperator(msg.sender, operatorAddress);
     }
 
     function activeOperator(address operatorAddress) public whenNotPaused onlyAdmin{
       operatorInfos[operators[operatorAddress]].isActive = true;
+      emit ActiveOperator(msg.sender, operatorAddress);
     }
 
     function isOperator(address operatorAddress) public view returns (bool){
@@ -51,5 +61,6 @@ contract Operator is GOGBoardAccessor {
     function changeAddress(address operatorAddress, uint _tokenId) public whenNotPaused onlyAdmin{
       require(_tokenId < tokenId);
       operators[operatorAddress] = _tokenId;
+      emit ChangeAddress(msg.sender, operatorAddress, _tokenId);
     }
 }
