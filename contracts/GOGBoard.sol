@@ -23,8 +23,8 @@ contract GOGBoard is Ownable {
       mapping (address => bool) voted;
       uint agree;
       uint startTime;
-      uint endTime;
-      bool isVoting;
+      uint endTime;                     //the last time clould vote
+      bool isVoting;                   //whether or not it is over
       address votedAddress;
       string votedName;
     }
@@ -119,6 +119,7 @@ contract GOGBoard is Ownable {
       minutesForDebate = _minutesForDebate;
       chairMan = msg.sender;
       secretaryGeneral = msg.sender;
+      // add the address(0) to the position 0, so the real member start at the position 1
       BoardMember memory boardMemberNull = BoardMember ({
         memberAddress:address(0),
         memberTime:now,
@@ -135,8 +136,31 @@ contract GOGBoard is Ownable {
       gogPause = false;
     }
 
+    /**
+    *  validate the contract
+    */
     function supportsGOGBoard() public pure returns(bytes32) {
       return SUPPORT;
+    }
+
+    function isSystemAddress(address _systemAddress) public view returns (bool) {
+      return systemAddress[_systemAddress];
+    }
+
+    function isPaused() public view returns (bool) {
+      return gogPause;
+    }
+
+    function isChairMan(address _chairManAddress) public view returns (bool) {
+      return chairMan == _chairManAddress;
+    }
+
+    function isSecretaryGeneral(address _secretaryGeneralAddress) public  view returns (bool) {
+      return secretaryGeneral == _secretaryGeneralAddress;
+    }
+
+    function isBoardMember(address boardMember) public view returns (bool) {
+      return memberToIndex[boardMember] != 0;
     }
 
     function setSGMarginOfVotesForMajority (uint _sGMarginOfVotesForMajority) public onlyAdmin {
@@ -181,16 +205,12 @@ contract GOGBoard is Ownable {
       emit DeleteSystemAddress(msg.sender, _systemAddress);
     }
 
-    function isSystemAddress(address _systemAddress) public view returns (bool) {
-      return systemAddress[_systemAddress];
-    }
-
     function vote(uint8 _type, bool isAgree) public onlyBoardMember whenCorrectType(_type) {
       Propose storage propose = voteToPropose[_type];
       require(propose.isVoting == true && propose.voted[msg.sender] == false);
-      propose.numberOfVotes += 1;
+      propose.numberOfVotes = propose.numberOfVotes.add(1);
       if (isAgree) {
-        propose.agree += 1;
+        propose.agree = propose.agree.add(1);
       }
       emit VoteEvent(msg.sender,_type, isAgree);
     }
@@ -250,18 +270,6 @@ contract GOGBoard is Ownable {
       _deleteVoted(_type, executeResult);
     }
 
-    function isChairMan(address _chairManAddress) public view returns (bool) {
-      return chairMan == _chairManAddress;
-    }
-
-    function isSecretaryGeneral(address _secretaryGeneralAddress) public  view returns (bool) {
-      return secretaryGeneral == _secretaryGeneralAddress;
-    }
-
-    function isBoardMember(address boardMember) public view returns (bool) {
-      return memberToIndex[boardMember] != 0;
-    }
-
     function pause () public onlyAdmin {
       gogPause = true;
       emit Pause(msg.sender);
@@ -272,11 +280,7 @@ contract GOGBoard is Ownable {
       emit UnPause(msg.sender);
     }
 
-    function isPaused() public view returns (bool) {
-      return gogPause;
-    }
-
-    function _addMember(address targetMember, string _memberName) private  {
+    function _addMember(address targetMember, string _memberName) private {
       BoardMember memory boardMember = BoardMember ({
         memberAddress:msg.sender,
         memberTime:now,
