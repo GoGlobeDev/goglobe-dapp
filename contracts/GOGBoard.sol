@@ -23,8 +23,10 @@ contract GOGBoard is Ownable {
       mapping (address => bool) voted;
       uint agree;
       uint startTime;
-      uint endTime;                     //the last time clould vote
-      bool isVoting;                   //whether or not it is over
+      //the last time could vote
+      uint endTime;
+      //whether or not it is over
+      bool isVoting;
       address votedAddress;
       string votedName;
     }
