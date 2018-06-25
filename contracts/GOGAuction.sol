@@ -66,6 +66,12 @@ contract GOGAuction is GOGBoardAccessor{
     _bid(_tokenId);
   }
 
+  function batchBid(uint[] _tokenIds) public payable whenNotPaused {
+    for (uint i = 0; i < tokenIds.length; i++) {
+      _bid(_tokenIds[i]);
+    }
+  }
+
   function _createAuction(uint _tokenId, uint _ethValue, uint _gogTValue, uint defaultDuration) private onlyOwnerOfGOGA(_tokenId){
     require(!tokenToAuction[_tokenId].isOnAuction);
     require(defaultDuration > 0);

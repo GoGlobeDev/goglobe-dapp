@@ -5,7 +5,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "truffle-hdwallet-provider": "0.0.3",
-    "openzeppelin-solidity": "1.10.0"
+    "openzeppelin-solidity": "1.10.0",
+    "scrypt": "^6.0.3",
+    "truffle-hdwallet-provider": "0.0.5"
   }
 }

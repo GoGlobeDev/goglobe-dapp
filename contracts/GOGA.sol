@@ -7,6 +7,7 @@ import "./ERC721.sol";
 contract GOGA is ERC721,GOGBoardAccessor {
 
     using SafeMath for uint256;
+    
     struct Asset {
       string name;
       string country;
