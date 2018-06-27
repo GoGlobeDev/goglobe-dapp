@@ -15,9 +15,9 @@ contract Certification is GOGBoardAccessor {
     //lawyer has checked the projects of the GOGA
     mapping(uint => uint[]) lawyerToGOGAProject;
     mapping(uint => uint) gogAProjectToLawyer;
-    mapping(uint => uint) gogAToOperator;
-    //operator do business with the GOGA
-    mapping(uint => uint[]) operatorToGOGA;
+    mapping(uint => uint) gogAProjectToOperator;
+    //operator do business with the GOGA's project
+    mapping(uint => uint[]) operatorToGOGAProject;
     Lawyer lawyer;
     Operator operator;
     GOGA gogA;
@@ -43,8 +43,12 @@ contract Certification is GOGBoardAccessor {
     event AddTokenIdToOperator(address indexed _admin, address indexed _operator, uint _tokenId);
     event ShareOutBonus(address indexed _operator, address indexed _receiver, uint indexed time, uint ethValue, uint gogValue);
 
-    function isCertificated(uint256 tokenId) public view returns (bool){
-      return (gogAToOperator[gogA.getProjectByTokenId(tokenId)] != 0 && gogAToOperator[tokenId] != 0);
+    /**
+    *    check gogATokenId
+    **/
+    function isCertificated(uint256 _gogATokenId) public view returns (bool){
+      uint _projectTokenId = gogA.getProjectByTokenId(_gogATokenId);
+      return (gogAProjectToLawyer[_projectTokenId] != 0 && gogAProjectToOperator[_projectTokenId] != 0);
     }
 
     function updateLawyer(address lawyerAddress) public whenNotPaused onlyAdmin {
@@ -83,15 +87,18 @@ contract Certification is GOGBoardAccessor {
       emit CertificateByLawyer(msg.sender, projectTokenId);
     }
 
-    function addTokenIdToOperator(address operatorAddress, uint256 tokenId) public whenNotPaused onlyAdmin returns (bool){
-      gogAToOperator[tokenId] = operator.getTokenId(operatorAddress);
-      operatorToGOGA[operator.getTokenId(operatorAddress)].push(tokenId);
+    /**
+    *    add token to operator
+    **/
+    function addTokenIdToOperator(address operatorAddress, uint256 projectTokenId) public whenNotPaused onlyAdmin returns (bool){
+      gogAProjectToOperator[tokenId] = operator.getTokenId(operatorAddress);
+      operatorToGOGAProject[operator.getTokenId(operatorAddress)].push(tokenId);
       emit AddTokenIdToOperator(msg.sender, operatorAddress, tokenId);
     }
 
     function shareOutBonus(uint _gogATokenId, uint gogTValue) public payable whenNotPaused onlyOperator {
       require(gogT.balanceOf(msg.sender) >= gogTValue);
-      require(gogAToOperator[_gogATokenId] == operator.getTokenId(msg.sender));
+      require(gogAProjectToOperator[gogA.getProjectByTokenId(_gogATokenId)] == operator.getTokenId(msg.sender));
       require(msg.value > 0);
       uint256[] memory gogATToken = gogAP.getPFromA(_gogATokenId);
       uint length = gogATToken.length;
