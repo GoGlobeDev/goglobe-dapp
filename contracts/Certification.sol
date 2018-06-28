@@ -91,9 +91,9 @@ contract Certification is GOGBoardAccessor {
     *    add token to operator
     **/
     function addTokenIdToOperator(address operatorAddress, uint256 projectTokenId) public whenNotPaused onlyAdmin returns (bool){
-      gogAProjectToOperator[tokenId] = operator.getTokenId(operatorAddress);
-      operatorToGOGAProject[operator.getTokenId(operatorAddress)].push(tokenId);
-      emit AddTokenIdToOperator(msg.sender, operatorAddress, tokenId);
+      gogAProjectToOperator[projectTokenId] = operator.getTokenId(operatorAddress);
+      operatorToGOGAProject[operator.getTokenId(operatorAddress)].push(projectTokenId);
+      emit AddTokenIdToOperator(msg.sender, operatorAddress, projectTokenId);
     }
 
     function shareOutBonus(uint _gogATokenId, uint gogTValue) public payable whenNotPaused onlyOperator {

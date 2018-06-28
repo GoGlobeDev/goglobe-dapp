@@ -67,7 +67,7 @@ contract GOGAuction is GOGBoardAccessor{
   }
 
   function batchBid(uint[] _tokenIds) public payable whenNotPaused {
-    for (uint i = 0; i < tokenIds.length; i++) {
+    for (uint i = 0; i < _tokenIds.length; i++) {
       _bid(_tokenIds[i]);
     }
   }

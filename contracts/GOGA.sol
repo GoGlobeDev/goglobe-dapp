@@ -3,11 +3,12 @@ pragma solidity ^0.4.23;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./GOGBoardAccessor.sol";
 import "./ERC721.sol";
+import "./GOGProject.sol";
 
 contract GOGA is ERC721,GOGBoardAccessor {
 
     using SafeMath for uint256;
-    
+
     struct Asset {
       string name;
       string country;
@@ -25,9 +26,11 @@ contract GOGA is ERC721,GOGBoardAccessor {
     mapping(uint256 => uint256) assetToProject;
     //the location asset in project array
     mapping(uint256 => uint256) assetInProjectIndex;
+    GOGProject gogProject;
 
     event UpdateTokenId(address indexed _operator, uint _newTokenId);
     event CreateAsset(address indexed _operator, uint256 indexed _projectId, string _name);
+    event SetGOGProject(address indexed _operator, address gogPorect);
 
     constructor(string _name, string _symbol) ERC721(_name, _symbol) public {}
 
@@ -35,8 +38,14 @@ contract GOGA is ERC721,GOGBoardAccessor {
       return assetToProject[_tokenId];
     }
 
+    function setGOGProject(address _gogProject) public whenNotPaused onlyAdmin {
+      require(address(0) != _gogProject);
+      gogProject = GOGProject(_gogProject);
+      emit SetGOGProject(msg.sender, _gogProject);
+    }
+
     function createAsset(uint256 projectId, string _name, string _country, string _city, string _location, string _url) public whenNotPaused returns(uint256){
-      require(projectId > 0);
+      require(gogProject.existTokenId(projectId));
       tokenId = tokenId.add(1);
       require(!exists(tokenId));
       _mint(msg.sender, tokenId);
