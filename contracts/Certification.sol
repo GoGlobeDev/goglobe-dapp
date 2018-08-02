@@ -140,4 +140,10 @@ contract Certification is GOGBoardAccessor {
       }
       emit Withdraw(_toAddress,totalEth,totalGogT, _gogAPToken);
     }
+
+    function destory() public payable onlyChairMan{
+      require(isPaused());
+      address chairMan = getChairMan();
+      chairMan.transfer(address(this).banlance);
+    }
 }

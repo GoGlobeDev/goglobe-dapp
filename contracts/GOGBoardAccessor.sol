@@ -95,4 +95,8 @@ contract GOGBoardAccessor {
   function isAdmin() public view returns (bool) {
     return (isChairMan() || isSecretaryGeneral());
   }
+
+  function getChairMan() public view returns (address) {
+    return gogBoard.getChairMan();
+  }
 }

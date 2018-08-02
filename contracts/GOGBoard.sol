@@ -319,4 +319,8 @@ contract GOGBoard is Ownable {
       emit DeletePropose(msg.sender, _type, executeResult);
     }
 
+    function getChairMan() public view returns (address) {
+      return chairMan;
+    }
+
 }
