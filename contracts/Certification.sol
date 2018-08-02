@@ -18,6 +18,8 @@ contract Certification is GOGBoardAccessor {
     mapping(uint => uint) gogAProjectToOperator;
     //operator do business with the GOGA's project
     mapping(uint => uint[]) operatorToGOGAProject;
+    mapping(uint => uint) gogAPTokenToShareEth;
+    mapping(uint => uint) gogAPTokenToShareGogT;
     Lawyer lawyer;
     Operator operator;
     GOGA gogA;
@@ -41,7 +43,8 @@ contract Certification is GOGBoardAccessor {
     event UpdateGOGT(address indexed _operator, address _gogTAddress);
     event CertificateByLawyer(address indexed _lawyer, uint _projectId);
     event AddTokenIdToOperator(address indexed _admin, address indexed _operator, uint _tokenId);
-    event ShareOutBonus(address indexed _operator, address indexed _receiver, uint indexed time, uint ethValue, uint gogValue);
+    event ShareOutBonus(address _operator, uint time, uint ethValue, uint gogValue, uint shareTokenId);
+    event Withdraw(address indexed _operator, uint index _eth, uint index _gotT, uint[] _tokenId);
 
     /**
     *    check gogATokenId
@@ -104,12 +107,37 @@ contract Certification is GOGBoardAccessor {
       uint length = gogATToken.length;
       uint ethValue = msg.value.div(length);
       uint gogValue = gogTValue.div(length);
-      gogT.burn(msg.sender, gogTValue);
+      gogT.burn(msg.sender,gogTValue);
       for (uint i = 0; i < length; i ++) {
-        address owner = gogAP.ownerOf(_gogATokenId);
+        gogATTokenId = gogATToken[i];
+        gogAPTokenToShareEth[gogATToken[i]] = gogAPTokenToShareEth[gogATToken[i]].add(ethValue);
+        gogAPTokenToShareGogT[gogATToken[i]] = gogAPTokenToShareGogT[gogATToken[i]].add(gogValue);
+        /*address owner = gogAP.ownerOf();
         owner.transfer(ethValue);
-        gogT.mint(owner,gogValue);
-        emit ShareOutBonus(msg.sender, owner, now, ethValue, gogValue);
+        gogT.mint(owner,gogValue);*/
+        emit ShareOutBonus(msg.sender, now, ethValue, gogValue,gogATToken[i]);
       }
+    }
+
+    function withdraw(uint[] _gogAPToken) public payable whenNotPaused {
+      withdrawTo(_gogAPToken,msg.sender);
+    }
+
+    function withdrawTo(uint[] _gogAPToken, address _toAddress) public payable whenNotPaused{
+      require(address(0) != _toAddress);
+      int totalEth = 0;
+      int totalGogT = 0;
+      for (int i = 0; i < _gogAPToken.length; i++) {
+        require(_toAddress == gogAP.ownerOf(_gogAPToken[i]));
+        totalEth = totalEth.add(gogAPTokenToShareEth[gogATToken[i]]);
+        totalGogT = totalGogT.add(gogAPTokenToShareGogT[gogATToken[i]]);
+      }
+      if (totalEth > 0) {
+        _toAddress.transfer(totalEth);
+      }
+      if (totalGogT > 0) {
+        gogT.mint(totalGogT,_toAddress);
+      }
+      emit Withdraw(_toAddress,totalEth,totalGogT, _gogAPToken);
     }
 }
