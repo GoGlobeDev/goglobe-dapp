@@ -5,7 +5,8 @@ import "./GOGBoardAccessor.sol";
 import "./ERC721.sol";
 import "./GOGA.sol";
 import "./Certification.sol";
-import "./GOGAuction.sol";
+import "./GOGFAuction.sol";
+import "./GOGSAuction.sol";
 
 contract GOGAP is GOGBoardAccessor,ERC721 {
 
@@ -18,7 +19,8 @@ contract GOGAP is GOGBoardAccessor,ERC721 {
     mapping(uint => bool) pMerged;
     GOGA gogA;
     Certification certification;
-    GOGAuction gogAuction;
+    GOGFAuction gogFAuction;
+    GOGSAuction gogSAuction;
 
     modifier onlyOwnerOfGOGA(uint256 gogATokenId) {
       require(msg.sender == gogA.ownerOf(gogATokenId));
@@ -59,10 +61,16 @@ contract GOGAP is GOGBoardAccessor,ERC721 {
       emit UpdateCertification(msg.sender, certificationAddress);
     }
 
-    function updateGOGAuction(address gogAuctionAddress) public whenNotPaused onlyAdmin {
-      require(address(0) != gogAuctionAddress);
-      gogAuction = GOGAuction(gogAuctionAddress);
+    function updateGOGFAuction(address gogFAuctionAddress) public whenNotPaused onlyAdmin {
+      require(address(0) != gogFAuctionAddress);
+      gogFAuction = GOGFAuction(gogFAuctionAddress);
       emit UpdateGOGAuction(msg.sender, gogAuctionAddress);
+    }
+
+    function updateGOGSAuction(address gogSAuctionAddress) public whenNotPaused onlyAdmin {
+      require(address(0) != gogSAuctionAddress);
+      gogSAuction = GOGSAuction(gogSAuctionAddress);
+      emit UpdateGOGAuction(msg.sender, gogSAuctionAddress);
     }
 
     function createPFromA(uint256 gogATokenId, uint256 copies) public whenNotPaused onlyOwnerOfGOGA(gogATokenId) onlyGOGACertification(gogATokenId) returns(uint256[]){
@@ -76,7 +84,8 @@ contract GOGAP is GOGBoardAccessor,ERC721 {
         resTokenId[i] = tokenId;
         pToA[tokenId] = gogATokenId;
         pMerged[tokenId] = true;
-        _approve(address(gogAuction), tokenId);
+        _approve(address(gogFAuction), tokenId);
+        _approve(address(gogSAuction), tokenId);
       }
       aToP[gogATokenId] = resTokenId;
       emit CreatePFromA(msg.sender, gogATokenId, copies);
