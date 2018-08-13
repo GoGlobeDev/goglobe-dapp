@@ -1,6 +1,6 @@
 pragma solidity ^0.4.23;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "./SafeMath.sol";
 import "./GOGBoardAccessor.sol";
 import "./ERC721.sol";
 import "./GOGA.sol";
@@ -34,7 +34,8 @@ contract GOGAP is GOGBoardAccessor,ERC721 {
 
     event UpdateGogA(address indexed _operator, address _gogAAddress);
     event UpdateCertification(address indexed _operator, address _certificationAddress);
-    event UpdateGOGAuction(address indexed _operator, address _gogAuctionAddress);
+    event UpdateGOGFAuction(address indexed _operator, address _gogAuctionAddress);
+    event UpdateGOGSAuction(address indexed _operator, address _gogAuctionAddress);
     event UpdateTokenId(address indexed _operator, uint _newTokenId);
     event CreatePFromA(address indexed _operator, uint indexed _aTokenId, uint copies);
     event MergePToA(address indexed _operator, uint[] _copies);
@@ -64,13 +65,13 @@ contract GOGAP is GOGBoardAccessor,ERC721 {
     function updateGOGFAuction(address gogFAuctionAddress) public whenNotPaused onlyAdmin {
       require(address(0) != gogFAuctionAddress);
       gogFAuction = GOGFAuction(gogFAuctionAddress);
-      emit UpdateGOGAuction(msg.sender, gogAuctionAddress);
+      emit UpdateGOGFAuction(msg.sender, gogFAuctionAddress);
     }
 
     function updateGOGSAuction(address gogSAuctionAddress) public whenNotPaused onlyAdmin {
       require(address(0) != gogSAuctionAddress);
       gogSAuction = GOGSAuction(gogSAuctionAddress);
-      emit UpdateGOGAuction(msg.sender, gogSAuctionAddress);
+      emit UpdateGOGSAuction(msg.sender, gogSAuctionAddress);
     }
 
     function createPFromA(uint256 gogATokenId, uint256 copies) public whenNotPaused onlyOwnerOfGOGA(gogATokenId) onlyGOGACertification(gogATokenId) returns(uint256[]){

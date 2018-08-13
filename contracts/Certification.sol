@@ -1,6 +1,6 @@
 pragma solidity ^0.4.23;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "./SafeMath.sol";
 import "./GOGBoardAccessor.sol";
 import "./Lawyer.sol";
 import "./Operator.sol";
@@ -109,7 +109,6 @@ contract Certification is GOGBoardAccessor {
       uint gogValue = gogTValue.div(length);
       gogT.burn(msg.sender,gogTValue);
       for (uint i = 0; i < length; i ++) {
-        gogATTokenId = gogATToken[i];
         gogAPTokenToShareEth[gogATToken[i]] = gogAPTokenToShareEth[gogATToken[i]].add(ethValue);
         gogAPTokenToShareGogT[gogATToken[i]] = gogAPTokenToShareGogT[gogATToken[i]].add(gogValue);
         /*address owner = gogAP.ownerOf();
@@ -125,25 +124,20 @@ contract Certification is GOGBoardAccessor {
 
     function withdrawTo(uint[] _gogAPToken, address _toAddress) public payable whenNotPaused{
       require(address(0) != _toAddress);
-      int totalEth = 0;
-      int totalGogT = 0;
-      for (int i = 0; i < _gogAPToken.length; i++) {
+      uint totalEth = 0;
+      uint totalGogT = 0;
+      for (uint i = 0; i < _gogAPToken.length; i++) {
         require(_toAddress == gogAP.ownerOf(_gogAPToken[i]));
-        totalEth = totalEth.add(gogAPTokenToShareEth[gogATToken[i]]);
-        totalGogT = totalGogT.add(gogAPTokenToShareGogT[gogATToken[i]]);
+        totalEth = totalEth.add(gogAPTokenToShareEth[_gogAPToken[i]]);
+        totalGogT = totalGogT.add(gogAPTokenToShareGogT[_gogAPToken[i]]);
       }
       if (totalEth > 0) {
         _toAddress.transfer(totalEth);
       }
       if (totalGogT > 0) {
-        gogT.mint(totalGogT,_toAddress);
+        gogT.mint(_toAddress,totalGogT);
       }
       emit Withdraw(_toAddress,totalEth,totalGogT, _gogAPToken);
     }
 
-    function destory() public payable onlyChairMan{
-      require(isPaused());
-      address chairMan = getChairMan();
-      chairMan.transfer(address(this).banlance);
-    }
 }

@@ -1,10 +1,10 @@
 pragma solidity ^0.4.23;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "./SafeMath.sol";
 import "./GOGAP.sol";
 import "./GOGT.sol";
 
-contract GOGAuction is GOGBoardAccessor{
+contract GOGFAuction is GOGBoardAccessor{
 
   using SafeMath for uint256;
 
