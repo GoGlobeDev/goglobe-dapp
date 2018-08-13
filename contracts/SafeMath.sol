@@ -1,66 +1,57 @@
 pragma solidity ^0.4.23;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "./GOGBoardAccessor.sol";
 
-contract Operator is GOGBoardAccessor {
+/**
+ * @title SafeMath
+ * @dev Math operations with safety checks that revert on error
+ */
+library SafeMath {
 
-    using SafeMath for uint256;
-
-    struct OperatorInfo {
-      bool isActive;
-      string name;
-      string desc;
-      string url;
+  /**
+  * @dev Multiplies two numbers, reverts on overflow.
+  */
+  function mul(uint256 _a, uint256 _b) internal pure returns (uint256) {
+    // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
+    // benefit is lost if 'b' is also tested.
+    // See: https://github.com/OpenZeppelin/openzeppelin-solidity/pull/522
+    if (_a == 0) {
+      return 0;
     }
 
-    uint256 tokenId;
-    //address to tokenId
-    mapping (address => uint) operators;
-    //tokenId to the lawyerInfo
-    mapping (uint => OperatorInfo) operatorInfos;
+    uint256 c = _a * _b;
+    require(c / _a == _b);
 
-    event AddOperator(address indexed _admin, address _operatorAddress, uint _tokenId, string _name);
-    event TerminateOperator(address indexed _admin, address _operatorAddress);
-    event ActiveOperator(address indexed _admin, address _operatorAddress);
-    event ChangeAddress(address indexed _admin, address indexed _changeAddress, uint indexed _tokenId);
+    return c;
+  }
 
-    function addOperator(address operatorAddress, string _name, string _desc, string _url) public whenNotPaused onlyAdmin returns (uint256){
-      tokenId = tokenId.add(1);
-      operators[operatorAddress] = tokenId;
-      OperatorInfo memory operatorInfo = OperatorInfo({
-        isActive: true,
-        name: _name,
-        desc: _desc,
-        url: _url
-      });
-      operatorInfos[operators[operatorAddress]] = operatorInfo;
-      emit AddOperator(msg.sender, operatorAddress, tokenId, _name);
-      return tokenId;
-    }
+  /**
+  * @dev Integer division of two numbers truncating the quotient, reverts on division by zero.
+  */
+  function div(uint256 _a, uint256 _b) internal pure returns (uint256) {
+    require(_b > 0); // Solidity only automatically asserts when dividing by 0
+    uint256 c = _a / _b;
+    // assert(_a == _b * c + _a % _b); // There is no case in which this doesn't hold
 
-    function terminateOperator(address operatorAddress) public whenNotPaused onlyAdmin{
-      operatorInfos[operators[operatorAddress]].isActive = false;
-      emit TerminateOperator(msg.sender, operatorAddress);
-    }
+    return c;
+  }
 
-    function activeOperator(address operatorAddress) public whenNotPaused onlyAdmin{
-      operatorInfos[operators[operatorAddress]].isActive = true;
-      emit ActiveOperator(msg.sender, operatorAddress);
-    }
+  /**
+  * @dev Subtracts two numbers, reverts on overflow (i.e. if subtrahend is greater than minuend).
+  */
+  function sub(uint256 _a, uint256 _b) internal pure returns (uint256) {
+    require(_b <= _a);
+    uint256 c = _a - _b;
 
-    function isOperator(address operatorAddress) public view returns (bool){
-      return (operators[operatorAddress] != 0 && operatorInfos[operators[operatorAddress]].isActive == true);
-    }
+    return c;
+  }
 
+  /**
+  * @dev Adds two numbers, reverts on overflow.
+  */
+  function add(uint256 _a, uint256 _b) internal pure returns (uint256) {
+    uint256 c = _a + _b;
+    require(c >= _a);
 
-    function getTokenId(address operatorAddress) public view returns (uint256) {
-      return operators[operatorAddress];
-    }
-
-    function changeAddress(address operatorAddress, uint _tokenId) public whenNotPaused onlyAdmin{
-      require(_tokenId < tokenId);
-      operators[operatorAddress] = _tokenId;
-      emit ChangeAddress(msg.sender, operatorAddress, _tokenId);
-    }
+    return c;
+  }
 }

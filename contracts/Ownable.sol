@@ -1,66 +1,64 @@
 pragma solidity ^0.4.23;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "./GOGBoardAccessor.sol";
 
-contract Operator is GOGBoardAccessor {
-
-    using SafeMath for uint256;
-
-    struct OperatorInfo {
-      bool isActive;
-      string name;
-      string desc;
-      string url;
-    }
-
-    uint256 tokenId;
-    //address to tokenId
-    mapping (address => uint) operators;
-    //tokenId to the lawyerInfo
-    mapping (uint => OperatorInfo) operatorInfos;
-
-    event AddOperator(address indexed _admin, address _operatorAddress, uint _tokenId, string _name);
-    event TerminateOperator(address indexed _admin, address _operatorAddress);
-    event ActiveOperator(address indexed _admin, address _operatorAddress);
-    event ChangeAddress(address indexed _admin, address indexed _changeAddress, uint indexed _tokenId);
-
-    function addOperator(address operatorAddress, string _name, string _desc, string _url) public whenNotPaused onlyAdmin returns (uint256){
-      tokenId = tokenId.add(1);
-      operators[operatorAddress] = tokenId;
-      OperatorInfo memory operatorInfo = OperatorInfo({
-        isActive: true,
-        name: _name,
-        desc: _desc,
-        url: _url
-      });
-      operatorInfos[operators[operatorAddress]] = operatorInfo;
-      emit AddOperator(msg.sender, operatorAddress, tokenId, _name);
-      return tokenId;
-    }
-
-    function terminateOperator(address operatorAddress) public whenNotPaused onlyAdmin{
-      operatorInfos[operators[operatorAddress]].isActive = false;
-      emit TerminateOperator(msg.sender, operatorAddress);
-    }
-
-    function activeOperator(address operatorAddress) public whenNotPaused onlyAdmin{
-      operatorInfos[operators[operatorAddress]].isActive = true;
-      emit ActiveOperator(msg.sender, operatorAddress);
-    }
-
-    function isOperator(address operatorAddress) public view returns (bool){
-      return (operators[operatorAddress] != 0 && operatorInfos[operators[operatorAddress]].isActive == true);
-    }
+/**
+ * @title Ownable
+ * @dev The Ownable contract has an owner address, and provides basic authorization control
+ * functions, this simplifies the implementation of "user permissions".
+ */
+contract Ownable {
+  address public owner;
 
 
-    function getTokenId(address operatorAddress) public view returns (uint256) {
-      return operators[operatorAddress];
-    }
+  event OwnershipRenounced(address indexed previousOwner);
+  event OwnershipTransferred(
+    address indexed previousOwner,
+    address indexed newOwner
+  );
 
-    function changeAddress(address operatorAddress, uint _tokenId) public whenNotPaused onlyAdmin{
-      require(_tokenId < tokenId);
-      operators[operatorAddress] = _tokenId;
-      emit ChangeAddress(msg.sender, operatorAddress, _tokenId);
-    }
+
+  /**
+   * @dev The Ownable constructor sets the original `owner` of the contract to the sender
+   * account.
+   */
+  constructor() public {
+    owner = msg.sender;
+  }
+
+  /**
+   * @dev Throws if called by any account other than the owner.
+   */
+  modifier onlyOwner() {
+    require(msg.sender == owner);
+    _;
+  }
+
+  /**
+   * @dev Allows the current owner to relinquish control of the contract.
+   * @notice Renouncing to ownership will leave the contract without an owner.
+   * It will not be possible to call the functions with the `onlyOwner`
+   * modifier anymore.
+   */
+  function renounceOwnership() public onlyOwner {
+    emit OwnershipRenounced(owner);
+    owner = address(0);
+  }
+
+  /**
+   * @dev Allows the current owner to transfer control of the contract to a newOwner.
+   * @param _newOwner The address to transfer ownership to.
+   */
+  function transferOwnership(address _newOwner) public onlyOwner {
+    _transferOwnership(_newOwner);
+  }
+
+  /**
+   * @dev Transfers control of the contract to a newOwner.
+   * @param _newOwner The address to transfer ownership to.
+   */
+  function _transferOwnership(address _newOwner) internal {
+    require(_newOwner != address(0));
+    emit OwnershipTransferred(owner, _newOwner);
+    owner = _newOwner;
+  }
 }
