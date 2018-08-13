@@ -44,7 +44,7 @@ contract Certification is GOGBoardAccessor {
     event CertificateByLawyer(address indexed _lawyer, uint _projectId);
     event AddTokenIdToOperator(address indexed _admin, address indexed _operator, uint _tokenId);
     event ShareOutBonus(address _operator, uint time, uint ethValue, uint gogValue, uint shareTokenId);
-    event Withdraw(address indexed _operator, uint index _eth, uint index _gotT, uint[] _tokenId);
+    event Withdraw(address indexed _operator, uint indexed _eth, uint indexed _gotT, uint[] _tokenId);
 
     /**
     *    check gogATokenId
